@@ -13,12 +13,12 @@ main()
   # We configure git
   git init
   git config user.name "Travis CI"
-  git config user.email "none@none.no"
+  git config user.email "none@none.none"
 
   # And we push everything to the right branch
   git add .
   git commit -m "Deploy to GitHub Pages"
-  git push --force "https://radium226:${GITHUB_TOKEN}@github.com/mythbuster-apache-spark-talk.git" "master:gh-pages"
+  git push --force "git@github.com:radium226/mythbuster-apache-spark-talk.git" "master:gh-pages"
 }
 
 main "${@}"

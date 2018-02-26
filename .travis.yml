@@ -1,0 +1,14 @@
+language: generic
+before_install:
+- >-
+  openssl aes-256-cbc
+    -K "${encrypted_xxxxxxxxxxxx_key}"
+    -iv "${encrypted_xxxxxxxxxxxx_iv}""
+    -in "./.travis.d/key.encrypted"
+    -out "./.travis.d/key"
+    -d
+- chmod 600 ".travis.d/key"
+- eval "$( ssh-agent -s )"
+- ssh-add ".travis.d/key"
+script:
+- ".travis.d/deploy"
