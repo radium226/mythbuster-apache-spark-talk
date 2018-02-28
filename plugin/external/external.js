@@ -18,8 +18,6 @@
 
     function loadExternal() {
 
-      alert("Couucou");
-
 	var sections = document.querySelectorAll( '[data-external]');
 
 	for( var i = 0, len = sections.length; i < len; i++ ) {
