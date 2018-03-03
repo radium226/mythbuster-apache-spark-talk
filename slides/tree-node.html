@@ -1,0 +1,254 @@
+<section>
+  <h1>Interlude • le trait <code>TreeNode</code></h1>
+</section>
+
+<section>
+  <h2>Structures en arbre</h2>
+  <ul>
+    <li>L'AST</li>
+    <li>Le plan logique d'execution</li>
+    <li>Le plan physique d'execution</li>
+  </ul>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait TreeNode[Type <: TreeNode[Type]] {
+  self: Type =>
+
+  def children: Seq[Type]
+
+  def copyWithNewChildren(children: Seq[Type]): Type = ???
+
+  def mapChildren(f: Type => Type): Type = {
+    copyWithNewChildren(children.map(f))
+  }
+
+  def transformDown(pf: PartialFunction[Type, Type]): Type = {
+    pf.applyOrElse(this, identity[Type])
+      .mapChildren(_.transformDown(pf))
+  }
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait BinaryTreeNode[Type <: TreeNode[Type]]
+  extends TreeNode[Type] {
+  self: Type =>
+
+  val leftChild: Type
+
+  val rightChild: Type
+
+  override def children = Seq(leftChild, rightChild)
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait UnaryTreeNode[Type <: TreeNode[Type]]
+  extends TreeNode[Type] {
+  self: Type =>
+
+  val child: Type
+
+  override def children = Seq(child)
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait LeafTreeNode[Type <: TreeNode[Type]]
+  extends TreeNode[Type] {
+  self: Type =>
+
+  def children = Nil
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <ul>
+    <li>Immutable</li>
+    <li>Transformation</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Modélisation d'un AST</h2>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait AST extends TreeNode[AST] {
+
+  def evaluate(): Float
+
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait BinaryAST extends AST with BinaryTreeNode[AST]
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait LeafAST extends AST with LeafTreeNode[AST]
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait UnaryAST extends AST with UnaryTreeNode[AST]
+  </code></pre>
+</section>
+
+<section>
+  <h2>Opération unaires</h2>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait UnaryArityOperation extends UnaryAST {
+
+  type Operator = (Float) => Float
+
+  val operator: Operator
+
+  override def evaluate() = operator(child.evaluate())
+
+}
+  </pre></code>
+</section>
+
+<section>
+  <h3>L'opposé</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Opposite(child: AST) extends UnaryArityOperation {
+
+  val operator = { -1 * _ }
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <h2>Opérations binaires</h2>
+  <pre class="bigger-code"><code data-trim data-noescape>
+trait BinaryArityOperation extends BinaryAST {
+
+  type Operator = (Float, Float) => Float
+
+  val operator: Operator
+
+  override def evaluate() = {
+    operator(leftChild.evaluate(), rightChild.evaluate())
+  }
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <div>
+    <h3>L'addition</h3>
+    <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Add(leftChild: AST, rightChild: AST)
+  extends BinaryArityOperation {
+
+  val operator: Operator = { _ + _ }
+
+}
+    </code></pre>
+  </div>
+
+  <div class="fragment">
+    <h3>La multiplication</h3>
+    <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Multiply(leftChild: AST, rightChild: AST)
+  extends BinaryArityOperation {
+
+  val operator: Operator = { _ * _ }
+
+}
+    </code></pre>
+  </div>
+</section>
+
+<section>
+  <h2>Les litéraux</h2>
+  <h3>Les nombres</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Number(val value: Float) extends LeafAST {
+
+  override def evaluate() = value
+
+}
+  </code></pre>
+</section>
+
+
+<section>
+  <h2>Example</h2>
+  <h3>Déclaration</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+val ast = Add(
+  Multiply(
+    Number(2),
+    Number(4)
+  ),
+  Multiply(
+    Add(
+      Number(3),
+      Number(5)
+    ),
+    Number(4)
+  )
+)
+  </code></pre>
+
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+println(s"${ast} = ${ast.evaluate()}")
+// ((2.0 × 4.0) + ((3.0 + 5.0) × 4.0)) = 40.0
+  </code></pre>
+</section>
+
+<section>
+  <h3>Règle de factorisation</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+// a * b + c * a = a * (b + c)
+object Factorize {
+
+  def unapply(ast: AST): Option[AST] = ast match {
+    case Add(Multiply(a, b), Multiply(c, d)) => (a, b, c, d) match {
+      case _ if a == c => Some(Multiply(a, Add(b, d)))
+      case _ if a == d => Some(Multiply(a, Add(b, c)))
+      case _ if b == c => Some(Multiply(b, Add(a, d)))
+      case _ if b == d => Some(Multiply(b, Add(a, c)))
+      case _ => None
+    }
+    case _ => None
+  }
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <h3>Application</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+val transformedAST = ast.transformDown({
+  case Factorize(factorizedAST) => factorizedAST
+})
+  </code></pre>
+
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+println(s"${transformedAST} = ${transformedAST.evaluate()}")
+// (4.0 × (2.0 + (3.0 + 5.0))) = 40.0
+  </code></pre>
+</section>
+
+<section>
+  <h3>Ce qu'il faut retenir : </h3>
+  <ul>
+    <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
+    <li>la methode <code>transformDown</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
+    <li>le <em>Pattern Matching</em> et les <em>Partial Functions</em> permettent d'avoir une syntaxe simple et claire lors de la définition de ces règles</li>
+  </ul>
+</section>
