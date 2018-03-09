@@ -76,14 +76,17 @@ Seq(
 ) !
   </code></pre>
 </section>
+
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val classLoader = new URLClassLoader("/tmp/generated-classes")
 
-val myTalker : Any = classLoader.loadClass("Talker").newInstance()
+val myTalker: Any = classLoader
+  .loadClass("Talker")
+  .newInstance()
   </code></pre>
-  <div>La variable <code>myTaker</code> est de type <code>Any</code></div>
 </section>
+
 <section>
   <div>Ouch</div>
   <div>La variable <code>myTaker</code> est de type <code>Any</code></div>
@@ -92,10 +95,10 @@ val myTalker : Any = classLoader.loadClass("Talker").newInstance()
 public interface Talker {
     String talk();
 }
-</code></pre>
+  </code></pre>
   <pre class="bigger-code scala"><code data-trim data-noescape>
   val javaClassCode =
-    """public class HelloTalker implements Talker{
+    """public class GeneratedTalker implements Talker {
       |
       | @Override
       | public String talk() {
@@ -107,16 +110,226 @@ public interface Talker {
     """.stripMargin
   </code></pre>
 </section>
+
 <section>
   <div>Et voilà le travail !</div>
 
   <pre class="bigger-code scala"><code data-trim data-noescape>
-val myTalker : Talker = classLoader.loadClass("HelloTalker").asInstanceOf[Talker]
-
+val myTalker: Talker = classLoader
+  .loadClass("HelloTalker")
+  .newInstance()
+  .asInstanceOf[Talker]
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 println(myTalker.talk())
 // "Hello World !"
   </code></pre>
 </section>
+
 <section>
-  <img src="../images/compileJava.png"  height="100" width="200">
+  <img src="./images/compileJava.png" />
+</section>
+
+<section>
+  <h1>So what?</h1>
+  <aside class="notes">
+    Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ?
+  </aside>
+</section>
+
+<section>
+  <h1>Execution d'une requête SQL</h1>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+def execute: String => Seq[Row] = ???
+  </code></pre>
+  <aside class="notes">
+    Retour au point de départ : on a une String, co
+  </aside>
+</section>
+
+<section>
+  <aside class="notes">
+    Résumé de tout sous forme de schéma
+  </aside>
+</section>
+
+<section>
+  <h1>Le parsing</h1>
+</section>
+
+<section>
+  <h2>Le Lexing</h2>
+
+  <aside class="notes">
+    Schéma avec un exemple de requête SQL
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+sealed trait Token
+
+case class Select() extends Token
+
+case class From() extends Token
+
+// ...
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+def lexer: String => Seq[Token] = ???
+  </code></pre>
+</section>
+
+<section>
+  <h2>Le parsing</h2>
+
+  <aside class="notes">
+    Pareil, un schéma depuis les token vers l'AST
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait AST
+
+case class Table(name: String) extends AST
+
+case class Alias(table: Table, name: String) extends AST
+
+case class Select(
+  projections: Seq[Expression],
+  filter: Option[Expression],
+  relations: Seq[Relation]
+) extends AST
+
+// ...
+
+trait Expression extends AST
+
+// ...
+  </code></pre>
+
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+def parser: Seq[Token] => AST
+  </code></pre>
+  <aside class="notes">
+    Le parser permet de donner un sens aux tokens : de hiérarchiser les tokens, et contextualiser tout ça. <br />
+    N'importe quel language utilise ça (y a un AST pour Java, pour Scala, etc.) y a rien de révolutionnaire et ça n'est pas du tout propre à Spark
+  </aside>
+</section>
+
+<section>
+  <aside class="notes">
+    Logos de Parser Combinator et ANTLR <br />
+    Pour nous, les Parser Combinator s'était suffisant, mais ANTLR c'est plus sérieux pour des langages beaucoup plus complexes (type SQL ANSI, etc.)
+  </aside>
+</section>
+
+<section>
+  <h2>Ce qu'il faut retenir</h2>
+  <ul>
+      <li>Grâce au parser, on a :</li>
+      <li><ul>
+        <li>Donné du sens au <code>String</code></li>
+        <li>Un moyen d'exploiter la requête de manière programatique grâce à l'<code>AST</code></li>
+      </ul></li>
+  </ul>
+  Il ne reste plus qu'à exécuter...
+</section>
+
+<section>
+  <h1>Execution</h1>
+</section>
+
+<section>
+  <h2>Catalyst</h2>
+  <aside class="notes">
+    C'est le moteur SQL, donc il gère la génération des plans et aussi l'optimisation
+  </aside>
+</section>
+
+<section>
+  <p>Deux étapes : </p>
+  <ul>
+    <li>Génération d'un plan d'execution logique : quelles sont les étapes par lesquelles passer pour évaluer l'AST</li>
+    <li>Génération d'un plan d'execution physique : comment est-ce que l'on executer ses étapes en fonction de l'environnement </li>
+  </ul>
+  <aside class="notes">
+    Avec Spark, tu peux faire des jointures entre des sources de données hétérogène. <br />
+    D'un point de vue logique, tu fais des jointures entre table, mais d'un point de vue physique, tu vas faire une jointure entre CsvTable et une JdbcTable
+    On en reparlera plus tard, mais un join logique peut-être un hash Join ou un nested loop (suivant l'environnemtn dans lequel tu executes)
+    Le plan d'execution logique, il ne permet pas d'executer, c'est juste une vision algébrique de ta requête (c'est vraiment un plan)
+    Le plan physique, c'est vraiment l'execution (le marteau piqueur, celui qui rentre dans le dur)
+    Ça n'est absolument pas spécifique à Spark, c'est commun à toutes les base de données (Oracle, etc.)
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+sealed trait LogicalPlan
+
+case class Projection(
+  child: LogicalPlan,
+  expression: Seq[Expression]
+) extends LogicalPlan
+
+case class Join(
+  leftChild: LogicalPlan,
+  rightChild: LogicalPlan,
+  expression: BinaryOperation
+) extends LogicalPlan
+
+case class Filter(
+  child: LogicalPlan,
+  expression: Expression
+) extends LogicalPlan
+
+// ...
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait PhysicalPlan {
+
+  def execute(): Iterator[Row]
+}
+
+case class CSVFileFullScan(
+  qualifierName: String,
+  csvFileURL: URL
+) extends PhysicalPlan {
+
+  override def execute(): Iterator[Row] = ???
+
+}
+
+case class Filter(
+  child: PhysicalPlan,
+  expression: e.Expression
+) extends PhysicalPlan {
+
+  override def execute() : Iterator[Row] = ???
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <h2>Le <em>Volcano Model</em></h2>
+  <p>Un opérateur = Une classe</p>
+</section>
+
+<section>
+  <aside class="notes">
+    Image du volcano model <br />
+    Classe qui s'imbriquent
+  </aside>
+</section>
+
+<section>
+  <h2>Catalyst</h2>
+  <aside class="notes">
+    Optimisation
+  </aside>
 </section>
