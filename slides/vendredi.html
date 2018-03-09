@@ -1,0 +1,85 @@
+<section>
+  <h1>Apache Spark</h1>
+  <h2>Qu'est-ce que c'est ?</h2>
+</section>
+
+<section>
+  <h3>En deux mots : </h3>
+  <ul>
+    <li>Framework de calcul distribué</li>
+    <li>Tolérant à la panne</li>
+    <li>Performant (tout <em>In Memory</em>, à l'inverse de <em>Map Reduce</em>)</li>
+    <li>Possibilité d'utiliser du SQL pour manipuler les données (qui peuvent être issues de base hétérogènes)</li>
+  </ul>
+  <aside class="notes">
+    Schéma d'un ETL distribué
+  </aside>
+</section>
+
+<section>
+  <h3>Le projet <em>Tungsten</em></h3>
+  <ul>
+    <li>Initié avec Spark 1.4</li>
+    <li><em>CPU is the bottlneck</em></li>
+    <li>Depuis Spark 2.0, génération de code à la volée</li>
+  </ul>
+  <aside class="notes">
+    Schéma avec SELECT<br />
+    Suite aux bench de Databricks : CPU is the bottelneck
+  </aside>
+</section>
+
+<section>
+  <h1>WTF?!</h1>
+  <aside class="notes">
+    Image WTF ? <br />
+    Pour bien comprendre, on farfouille dans Spark <br />
+    Qu'est ce que ça veut dire génération de code à la volée ?
+  </aside>
+</section>
+
+<section>
+  <h2>Génération de code à la volée</h2>
+  <ul>
+    <li>Execution d'un code compilé qui n'est pas défini à la compilation</li>
+    <li>Partir d'un <code>String</code> pour récupérer une <code>Class[_]</code></li>
+    <li class="fragment">Essayons !</li>
+  </ul>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+val javaClassCode =
+    """public class Talker {
+      |
+      | public String talk() {
+      |   return "Hello, World! ";
+      | }
+      |
+      |}
+      |
+    """.stripMargin
+  </code></pre>
+  <aside class="notes">
+    Pourquoi Java ? On a voulu faire comme Spark : c'est plus rapide à compiler, et en plus avec Janino, c'est stylé parce que c'est tout en mémoire.
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code bash"><code data-trim data-noescape>
+import sys.process._
+
+Seq(
+  "javac",
+  "-d", "/tmp/generated-sources",
+  "/tmp/generated-classes"
+) !
+  </code></pre>
+</section>
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+val classSource = JavaClassSource("demo.TalkerImpl", classCode)
+classSource.compile().foreach({ compiledClass =>
+  val talker = compiledClass.newInstance()
+  </code></pre>
+</section>
