@@ -127,7 +127,7 @@ println(myTalker.talk())
 </section>
 
 <section>
-  <img src="./images/compileJava.png" />
+  <img src="./images/compileJavaClean.png" style="background:none; border:none; box-shadow:none;"/>
 </section>
 
 <section>
@@ -333,3 +333,51 @@ case class Filter(
     Optimisation
   </aside>
 </section>
+<section>
+  <h2>Quelques optimisations dans Spark</h2>
+  <ul>
+    <li><code>PushDownPredicate</code></li>
+    <li><code>ColumnPruning</code></li>
+    <li><code>CombineFilters</code></li>
+  </ul>
+</section>
+<section>
+  <img src="./images/catalystExample.png" style="background:none; border:none; box-shadow:none;"/>
+</section>
+<section>
+  <h2>Une structure en arbre idéale pour agencer et optimiser le plan d'exécution</h2>
+</section>
+<section>
+  <h2>Définition d'un <em>Trait</em></h2>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait TreeNode[Type <: TreeNode[Type]] {
+                       self: Type =>
+
+  def children: Seq[Type]
+
+  def copyWithNewChildren(children: Seq[Type]): Type = ???
+
+  def mapChildren(f: Type => Type): Type = {
+    copyWithNewChildren(children.map(f))
+  }
+
+  def transformDown(pf: PartialFunction[Type, Type]): Type = {
+    pf.applyOrElse(this, identity[Type])
+      .mapChildren(_.transformDown(pf))
+  }
+
+}
+  </code></pre>
+</section>
+<section>
+  <h2>Exemple d'optimisation</h2>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+object CombineFilters extends Rule[LogicalPlan] {
+  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
+    case Filter(exp1, Filter(exp2, grandChild)) =>
+          Filter(And(exp1, exp2), grandChild)
+  }
+}
+  </code></pre>
+</section>
+
