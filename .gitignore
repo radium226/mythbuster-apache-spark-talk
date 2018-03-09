@@ -1,2 +1,4 @@
 .travis.d/key
 .travis.d/key.pub
+.idea/
+.DS_Store
