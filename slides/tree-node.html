@@ -3,15 +3,21 @@
 </section>
 
 <section>
-  <h2>Structures en arbre</h2>
+  <h2>Les structures en arbre sont omiprésentes</h2>
   <ul>
-    <li>L'AST</li>
-    <li>Le plan logique d'execution</li>
-    <li>Le plan physique d'execution</li>
+    <li>L'<em>Abstract Syntax Tree</em></li>
+    <li>Les plans d'execution</li>
+    <li>
+      <ul>
+        <li>Logiques</li>
+        <li>Physiques</li>
+      </ul>
+    </li>
   </ul>
 </section>
 
 <section>
+  <h2>Définition d'un <em>Trait</em></h2>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait TreeNode[Type <: TreeNode[Type]] {
   self: Type =>
@@ -24,16 +30,18 @@ trait TreeNode[Type <: TreeNode[Type]] {
     copyWithNewChildren(children.map(f))
   }
 
-  def transformDown(pf: PartialFunction[Type, Type]): Type = {
+  <mark>def transformDown(pf: PartialFunction[Type, Type]): Type = {
     pf.applyOrElse(this, identity[Type])
       .mapChildren(_.transformDown(pf))
-  }
+  }</mark>
 
 }
   </code></pre>
 </section>
 
 <section>
+  <h2>Quelques spécialisations</em>
+  <h3>L'abre binaire</em>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait BinaryTreeNode[Type <: TreeNode[Type]]
   extends TreeNode[Type] {
@@ -50,6 +58,7 @@ trait BinaryTreeNode[Type <: TreeNode[Type]]
 </section>
 
 <section>
+  <h3>L'abre unaire</h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait UnaryTreeNode[Type <: TreeNode[Type]]
   extends TreeNode[Type] {
@@ -64,6 +73,7 @@ trait UnaryTreeNode[Type <: TreeNode[Type]]
 </section>
 
 <section>
+  <h3>La feuille</h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait LeafTreeNode[Type <: TreeNode[Type]]
   extends TreeNode[Type] {
@@ -76,14 +86,15 @@ trait LeafTreeNode[Type <: TreeNode[Type]]
 </section>
 
 <section>
+  <h3>Quelques propriétés</h3>
   <ul>
-    <li>Immutable</li>
-    <li>Transformation</li>
+    <li>Les structures implémentant <code>TreeNode</code> doivent être immuables</li>
+    <li>Tout en parcourant l'arbre, il est possible de le transformer</li>
   </ul>
 </section>
 
 <section>
-  <h2>Modélisation d'un AST</h2>
+  <h2>Exemple avec un <em>AST</em> basique</h2>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 trait AST extends TreeNode[AST] {
 
@@ -103,7 +114,7 @@ trait UnaryAST extends AST with UnaryTreeNode[AST]
 </section>
 
 <section>
-  <h2>Opération unaires</h2>
+  <h3>Opération unaires</h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait UnaryArityOperation extends UnaryAST {
 
@@ -118,7 +129,7 @@ trait UnaryArityOperation extends UnaryAST {
 </section>
 
 <section>
-  <h3>L'opposé</h3>
+  <h4>L'opposé</h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Opposite(child: AST) extends UnaryArityOperation {
 
@@ -129,7 +140,7 @@ case class Opposite(child: AST) extends UnaryArityOperation {
 </section>
 
 <section>
-  <h2>Opérations binaires</h2>
+  <h3>Opérations binaires</h3>
   <pre class="bigger-code"><code data-trim data-noescape>
 trait BinaryArityOperation extends BinaryAST {
 
@@ -147,7 +158,7 @@ trait BinaryArityOperation extends BinaryAST {
 
 <section>
   <div>
-    <h3>L'addition</h3>
+    <h4>L'addition</h4>
     <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Add(leftChild: AST, rightChild: AST)
   extends BinaryArityOperation {
@@ -159,7 +170,7 @@ case class Add(leftChild: AST, rightChild: AST)
   </div>
 
   <div class="fragment">
-    <h3>La multiplication</h3>
+    <h4>La multiplication</h4>
     <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Multiply(leftChild: AST, rightChild: AST)
   extends BinaryArityOperation {
@@ -172,8 +183,8 @@ case class Multiply(leftChild: AST, rightChild: AST)
 </section>
 
 <section>
-  <h2>Les litéraux</h2>
-  <h3>Les nombres</h3>
+  <h3>Les litéraux</h3>
+  <h4>Les nombres</h4>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Number(val value: Float) extends LeafAST {
 
@@ -185,8 +196,8 @@ case class Number(val value: Float) extends LeafAST {
 
 
 <section>
-  <h2>Example</h2>
-  <h3>Déclaration</h3>
+  <h3>Utilisation</h3>
+  <h4>Déclaration</h4>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val ast = Add(
   Multiply(
@@ -210,20 +221,21 @@ println(s"${ast} = ${ast.evaluate()}")
 </section>
 
 <section>
-  <h3>Règle de factorisation</h3>
+  <h4>Règle de factorisation</h4>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 // a * b + c * a = a * (b + c)
 object Factorize {
 
   def unapply(ast: AST): Option[AST] = ast match {
-    case Add(Multiply(a, b), Multiply(c, d)) => (a, b, c, d) match {
-      case _ if a == c => Some(Multiply(a, Add(b, d)))
-      case _ if a == d => Some(Multiply(a, Add(b, c)))
-      case _ if b == c => Some(Multiply(b, Add(a, d)))
-      case _ if b == d => Some(Multiply(b, Add(a, c)))
+    case Add(Multiply(a, b), Multiply(c, d)) =>
+      (a, b, c, d) match {
+        case _ if a == c => Some(Multiply(a, Add(b, d)))
+        case _ if a == d => Some(Multiply(a, Add(b, c)))
+        case _ if b == c => Some(Multiply(b, Add(a, d)))
+        case _ if b == d => Some(Multiply(b, Add(a, c)))
+        case _ => None
+      }
       case _ => None
-    }
-    case _ => None
   }
 
 }
@@ -231,7 +243,7 @@ object Factorize {
 </section>
 
 <section>
-  <h3>Application</h3>
+  <h4>Application</h4>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val transformedAST = ast.transformDown({
   case Factorize(factorizedAST) => factorizedAST
@@ -245,7 +257,7 @@ println(s"${transformedAST} = ${transformedAST.evaluate()}")
 </section>
 
 <section>
-  <h3>Ce qu'il faut retenir : </h3>
+  <h2>Ce qu'il faut retenir : </h2>
   <ul>
     <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
     <li>la methode <code>transformDown</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
