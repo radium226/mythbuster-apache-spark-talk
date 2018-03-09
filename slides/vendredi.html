@@ -78,8 +78,45 @@ Seq(
 </section>
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
-val classSource = JavaClassSource("demo.TalkerImpl", classCode)
-classSource.compile().foreach({ compiledClass =>
-  val talker = compiledClass.newInstance()
+val classLoader = new URLClassLoader("/tmp/generated-classes")
+
+val myTalker : Any = classLoader.loadClass("Talker").newInstance()
   </code></pre>
+  <div>La variable <code>myTaker</code> est de type <code>Any</code></div>
+</section>
+<section>
+  <div>Ouch</div>
+  <div>La variable <code>myTaker</code> est de type <code>Any</code></div>
+  <div>Pour appeler plus facilement la méthode <code>talk()</code>, on rajoute une interface</div>
+  <pre class="bigger-code java"><code data-trim data-noescape>
+public interface Talker {
+    String talk();
+}
+</code></pre>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+  val javaClassCode =
+    """public class HelloTalker implements Talker{
+      |
+      | @Override
+      | public String talk() {
+      |   return "Hello, World! ";
+      | }
+      |
+      |}
+      |
+    """.stripMargin
+  </code></pre>
+</section>
+<section>
+  <div>Et voilà le travail !</div>
+
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+val myTalker : Talker = classLoader.loadClass("HelloTalker").asInstanceOf[Talker]
+
+println(myTalker.talk())
+// "Hello World !"
+  </code></pre>
+</section>
+<section>
+  <img src="../images/compileJava.png"  height="100" width="200">
 </section>
