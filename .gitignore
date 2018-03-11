@@ -2,3 +2,5 @@
 .travis.d/key.pub
 .idea/
 .DS_Store
+
+node_modules

@@ -10,6 +10,42 @@
 			.reveal pre.bigger-code code {
 				max-height: 100%;
 			}
+
+			.reveal section img {
+				background: none;
+				border: none;
+				box-shadow: none;
+			}
+
+			.reveal section ul li blockquote {
+				quotes: "“" "”" "‘" "’";
+				display: inline;
+				border: none;
+				background: #eee;
+				box-shadow: none;
+				margin-left: 0.25em;
+				padding-left: 0.25em;
+				border-left: 0.125em solid #ccc;
+			}
+
+			.left-column {
+				left: -8.33%;
+				text-align: left;
+				float: left;
+				width: 50%;
+				z-index: -10;
+				text-align: center;
+			}
+
+			.right-column {
+				left: 31.25%;
+				top: 75px;
+				float: right;
+				text-align: right;
+				z-index: -10;
+				width: 50%;
+				text-align: center;
+			}
 		</style>
 	</head>
 	<body>
@@ -27,7 +63,7 @@
 		<script src="js/reveal.js"></script>
 		<script>
 			Reveal.initialize({
-				showNotes: true, 
+				showNotes: true,
 				dependencies: [ {
 					src: "plugin/external/external.js",
 					condition: function() {
@@ -41,7 +77,15 @@
 						hljs.initHighlightingOnLoad();
 					}
 				}, {
-					src: 'plugin/math/math.js',
+					src: "plugin/math/math.js",
+					async: true
+				},
+				{
+					src: "socket.io/socket.io.js",
+					async: true
+				},
+				{
+					src: "plugin/notes-server/client.js",
 					async: true
 				} ]
 			});

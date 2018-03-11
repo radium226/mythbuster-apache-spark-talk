@@ -1,18 +1,22 @@
 <section>
-  <div>Génération de code, moteur Catalyst…</div>
-  <h2>Démystifions Apache Spark !</h2>
+  <header>
+    <p>Génération de code, moteur <em>Catalyst</em>&hellip;</p>
+    <h1>Démystifions <em>Apache Spark !</em></h1>
+  </header>
 </section>
+
 <section>
-  <div>Qu'est-ce que c'est ?</div>
-  <img src="./images/spark-presentation.png" style="background:none; border:none; box-shadow:none;"/>
+  <img src="./images/apache-spark-logo.svg" />
+  <h2>Qu'est-ce que c'est ?</h2>
 </section>
+
 <section>
-  <h3>En deux mots : </h3>
+  <h3>En résumé, <em>Apache Spark</em>&nbsp;:</h3>
   <ul>
-    <li>Framework de calcul distribué</li>
-    <li>Tolérant à la panne</li>
-    <li>Performant (tout <em>In Memory</em>, à l'inverse de <em>Map Reduce</em>)</li>
-    <li>Possibilité d'utiliser du SQL pour manipuler les données (qui peuvent être issues de base hétérogènes)</li>
+    <li>Est un <strong>framework de calcul distribué</strong> <em>In Memory</em>&nbsp;;</li>
+    <li>Qui est <strong>tolérant à la panne</strong>&nbsp;;</li>
+    <li>Se base sur des <strong>abstractions</strong> de plusieurs niveaux (<code>RDD[_]</code>, <code>DataFrame</code>, etc.)&nbsp;;</li>
+    <li>Permet l'<strong>utilisation du SQL</strong> sur des sources de données hétérogènes. </li>
   </ul>
   <aside class="notes">
     Schéma d'un ETL distribué
@@ -22,9 +26,10 @@
 <section>
   <h3>Le projet <em>Tungsten</em></h3>
   <ul>
-    <li>Initié avec Spark 1.4</li>
-    <li><em>CPU is the bottlneck</em></li>
-    <li>Depuis Spark 2.0, génération de code à la volée</li>
+    <li>Initié à partir d'<em>Apache Spark</em> 1.4&nbsp;;</li>
+    <li>Ayant pour objectif une <strong>amélioration des performances</strong> sans changement de l'API&nbsp;;</li>
+    <li><blockquote>CPU is the new bottlneck</blockquote>&nbsp;;</li>
+    <li>Depuis <em>Apache Spark</em> 2.0, <strong>génération de code</strong> à la volée. </li>
   </ul>
   <aside class="notes">
     Schéma avec SELECT<br />
@@ -33,7 +38,7 @@
 </section>
 
 <section>
-  <h1>WTF?!</h1>
+  <img src="./images/wait-a-minute.jpg" />
   <aside class="notes">
     Image WTF ? <br />
     Pour bien comprendre, on farfouille dans Spark <br />
@@ -42,12 +47,20 @@
 </section>
 
 <section>
-  <h2>Génération de code à la volée</h2>
+  <h2>Générer du code à la volée ?</h2>
+  <p>Challenge Accepted! </p>
+</section>
+
+<section>
+  <h3>De quoi parle-t-on exactement ?</h3>
   <ul>
-    <li>Execution d'un code compilé qui n'est pas défini à la compilation</li>
-    <li>Partir d'un <code>String</code> pour récupérer une <code>Class[_]</code></li>
-    <li class="fragment">Essayons !</li>
+    <li>Compiler un code <strong>pendant l'exécution</strong>&nbsp;;</li>
+    <li>Partir d'un <code>String</code> pour récupérer une <code>Class[_]</code>&nbsp;;</li>
   </ul>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+def compile(code: String): Class[_] = ???
+  </code></pre>
+  <h3 class="fragment">Essayons !</h3>
 </section>
 
 <section>
@@ -63,13 +76,7 @@ val javaClassCode =
       |
     """.stripMargin
   </code></pre>
-  <aside class="notes">
-    Pourquoi Java ? On a voulu faire comme Spark : c'est plus rapide à compiler, et en plus avec Janino, c'est stylé parce que c'est tout en mémoire.
-  </aside>
-</section>
-
-<section>
-  <pre class="bigger-code bash"><code data-trim data-noescape>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 import sys.process._
 
 Seq(
@@ -78,27 +85,38 @@ Seq(
   "/tmp/generated-classes"
 ) !
   </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+val classLoader = new URLClassLoader("/tmp/generated-classes")
+  </code></pre>
 </section>
 
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
-val classLoader = new URLClassLoader("/tmp/generated-classes")
-
-val myTalker: Any = classLoader
+val myTalker = classLoader
   .loadClass("Talker")
   .newInstance()
+myTalker.talk()
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+// Cannot resolve symbol talk
   </code></pre>
 </section>
 
 <section>
-  <div>Ouch</div>
-  <div>La variable <code>myTalker</code> est de type <code>Any</code></div>
-  <div>Pour appeler plus facilement la méthode <code>talk()</code>, on rajoute une interface</div>
-  <pre class="bigger-code java"><code data-trim data-noescape>
+  <h3>Ouch! </h3>
+  <p>Le type de <code>myTalker</code> n'est pas défini à la compilation !</p>
+  <p>Il nous faut un <strong>pont</strong> entre le <em>Compile Time</em> et le <em>Run Time</em>&hellip; </p>
+  <pre class="bigger-code java fragment"><code data-trim data-noescape>
 public interface Talker {
     String talk();
 }
   </code></pre>
+  <aside class="notes">
+    Pourquoi Java ? On a voulu faire comme Spark : c'est plus rapide à compiler, et en plus avec Janino, c'est stylé parce que c'est tout en mémoire.
+  </aside>
+</section>
+
+<section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
   val javaClassCode =
     """public class GeneratedTalker implements Talker {
@@ -112,12 +130,7 @@ public interface Talker {
       |
     """.stripMargin
   </code></pre>
-</section>
-
-<section>
-  <div>Et voilà le travail !</div>
-
-  <pre class="bigger-code scala"><code data-trim data-noescape>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 val myTalker: Talker = classLoader
   .loadClass("HelloTalker")
   .newInstance()
@@ -134,16 +147,24 @@ println(myTalker.talk())
 </section>
 
 <section>
-  <h1>So what?</h1>
+  <h3>Et <em>Apache Spark</em>, dans tout ça ?</h2>
+  <img src="./images/so-what.png" />
   <aside class="notes">
     Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ?
   </aside>
 </section>
 
 <section>
-  <h1>Execution d'une requête SQL</h1>
+  <h3>MythBuster: Apache Spark</h3>
+  <img src="./images/mythbuster-apache-spark-logo.png" />
+  <p>Où comment passer 6 mois à décortiquer le code d'<em>Apache Spark</em>&hellip;</p>
+</section>
+
+<section>
+  <h2><em>Back To Basics...</em></h2>
+  <p>Comment <em>Apache Spark</em> exécute une requête SQL&nbsp;?</p>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-def execute: String => Seq[Row] = ???
+def execute(sql: String): Seq[Row] = ???
   </code></pre>
   <aside class="notes">
     Retour au point de départ : on a une String, co
@@ -151,25 +172,23 @@ def execute: String => Seq[Row] = ???
 </section>
 
 <section>
+  <h3><em>Parsing</em> d'une reqête SQL</h3>
+  <p>Deux étapes&nbsp;:</p>
+  <img src="?" />
   <aside class="notes">
     Résumé de tout sous forme de schéma
   </aside>
 </section>
 
 <section>
-  <h1>Le parsing</h1>
-</section>
-
-<section>
-  <h2>Le Lexing</h2>
-
+  <h4>L'analyse lexicale</h4>
   <aside class="notes">
     Schéma avec un exemple de requête SQL
   </aside>
 </section>
 
 <section>
-  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
 sealed trait Token
 
 case class Select() extends Token
@@ -184,7 +203,7 @@ def lexer: String => Seq[Token] = ???
 </section>
 
 <section>
-  <h2>Le parsing</h2>
+  <h4>L'analyse syntaxique</h4>
 
   <aside class="notes">
     Pareil, un schéma depuis les token vers l'AST
@@ -202,7 +221,7 @@ case class Alias(table: Table, name: String) extends AST
 case class Select(
   projections: Seq[Expression],
   filter: Option[Expression],
-  relations: Seq[Relation]
+  relations: Seq[Table]
 ) extends AST
 
 // ...
@@ -222,6 +241,16 @@ def parser: Seq[Token] => AST
 </section>
 
 <section>
+  <h3>Implémentations</h3>
+  <div>
+    <div class="left-column">
+      <img src="./images/scala-logo.png" />
+      <h4 style="text-align: center;">Parser Combinators</h4>
+    </div>
+    <div class="right-column">
+      <img style="width: 50%; height: 50%;" src="./images/antlr-logo.jpg" />
+    </div>
+  </div>
   <aside class="notes">
     Logos de Parser Combinator et ANTLR <br />
     Pour nous, les Parser Combinator s'était suffisant, mais ANTLR c'est plus sérieux pour des langages beaucoup plus complexes (type SQL ANSI, etc.)
@@ -229,34 +258,27 @@ def parser: Seq[Token] => AST
 </section>
 
 <section>
-  <h2>Ce qu'il faut retenir</h2>
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
   <ul>
-      <li>Grâce au parser, on a :</li>
-      <li><ul>
-        <li>Donné du sens au <code>String</code></li>
-        <li>Un moyen d'exploiter la requête de manière programatique grâce à l'<code>AST</code></li>
-      </ul></li>
+    <li>L'analyse lexicale transforme une chaîne de caractère en lexèmes appartenant au <strong>lexique du langage</strong>&nbsp;;</li>
+    <li>L'analyse syntaxique <strong>donne du sens</strong> à ces lexèmes en produisant un <em>AST</em>&nbsp;</li>
+    <li>L'<em>AST</em> est une structure exploitable par le code&nbsp;</li>
+    <li><strong>ANTLR est un standard</strong> pour des langages complexes, et c'est ce qu'utilise <em>Apache Spark</em>. </li>
   </ul>
-  Il ne reste plus qu'à exécuter...
+  <p><span class="fragment">Notre requête SQL étant parsée&hellip; </span><span class="fragment">Il n'y plus qu'à l'executer&nbsp;!</span></p>
 </section>
 
 <section>
-  <h1>Execution</h1>
+  <h3>Exécution de la requête SQL</h3>
+  <p>Deux étapes&nbsp;</p>
 </section>
 
 <section>
-  <h2>Catalyst</h2>
-  <aside class="notes">
-    C'est le moteur SQL, donc il gère la génération des plans et aussi l'optimisation
-  </aside>
-</section>
-
-<section>
-  <p>Deux étapes : </p>
-  <ul>
-    <li>Génération d'un plan d'execution logique : quelles sont les étapes par lesquelles passer pour évaluer l'AST</li>
-    <li>Génération d'un plan d'execution physique : comment est-ce que l'on executer ses étapes en fonction de l'environnement </li>
-  </ul>
+  <h4>Plan d'execution logique</h4>
+  <p>Quelles sont les étapes par lesquelles on va passer pour évaluer l'AST&nbsp;?</p>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+sealed trait LogicalPlan
+  </code></pre>
   <aside class="notes">
     Avec Spark, tu peux faire des jointures entre des sources de données hétérogène. <br />
     D'un point de vue logique, tu fais des jointures entre table, mais d'un point de vue physique, tu vas faire une jointure entre CsvTable et une JdbcTable
@@ -269,16 +291,12 @@ def parser: Seq[Token] => AST
 
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
-sealed trait LogicalPlan
-
 case class Projection(
-  child: LogicalPlan,
-  expression: Seq[Expression]
+  child: LogicalPlan, expression: Seq[Expression]
 ) extends LogicalPlan
 
 case class Join(
-  leftChild: LogicalPlan,
-  rightChild: LogicalPlan,
+  leftChild: LogicalPlan, rightChild: LogicalPlan,
   expression: BinaryOperation
 ) extends LogicalPlan
 
@@ -289,38 +307,57 @@ case class Filter(
 
 // ...
   </code></pre>
+  <p class="fragment">Purement déclaratif, toujours pas d'execution !</p>
 </section>
 
 <section>
-  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+  <h4>Plan d'exécution physique</h4>
+  <p>Maintenant que l'on connait les étapes par lesquelles passées, comment est-ce qu'on les exécute&nbsp;?</p>
+</section>
+
+<section>
+  <h4>Le <em>Volcano Model</em></h4>
+  <p>Un peu d'histoire&nbsp;:</p>
+  <ul>
+    <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;</li>
+    <li>La quasi-totalité des SGBDR s'appuient sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;</li>
+    <li><em>Push</em> de la donnée&nbsp;</li>
+    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe. </li>
+  </ul>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
 trait PhysicalPlan {
 
   def execute(): Iterator[Row]
-}
-
-case class CSVFileFullScan(
-  qualifierName: String,
-  csvFileURL: URL
-) extends PhysicalPlan {
-
-  override def execute(): Iterator[Row] = ???
-
-}
-
-case class Filter(
-  child: PhysicalPlan,
-  expression: e.Expression
-) extends PhysicalPlan {
-
-  override def execute() : Iterator[Row] = ???
-
 }
   </code></pre>
 </section>
 
 <section>
-  <h2>Le <em>Volcano Model</em></h2>
-  <p>Un opérateur = Une classe</p>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Filter(
+  child: PhysicalPlan, predicate: Expression with Predicate
+) extends PhysicalPlan {
+
+  override def execute() : Iterator[Row] = {
+    child.execute()
+      .filter(predicate.evaluate)
+  }
+
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+case class CSVFileFullScan(
+  csvFilePath: Path
+) extends PhysicalPlan
+
+case class NestedLoopJoin(
+  leftChild: PhysicalPlan,
+  rightChild: PhysicalPlan,
+  predicate: Expression with Predicate
+) extends PhysicalPlan
+
+// Etc.
+  </code></pre>
 </section>
 
 <section>
@@ -331,11 +368,25 @@ case class Filter(
 </section>
 
 <section>
-  <h2>Catalyst</h2>
+  <img src="./images/résumé.png" />
   <aside class="notes">
-    Optimisation
+
   </aside>
 </section>
+
+<section>
+  <h3>Optimisation</h3>
+  <p>Objectif&nbsp;:</p>
+  <ul>
+
+    <li>Au sein d'<em>Apache Spark</em>, le moteur d'execution s'appelle <em>Catalyst</em>. </li>
+  </ul>
+  <aside class="notes">
+Définition +
+
+  </aside>
+</section>
+
 <section>
   <h2>Quelques optimisations dans Spark</h2>
   <ul>
@@ -364,7 +415,7 @@ trait TreeNode[Type <: TreeNode[Type]] {
     copyWithNewChildren(children.map(f))
   }
 
-  def transformDown(pf: PartialFunction[Type, Type]): Type = {
+  def transform(pf: PartialFunction[Type, Type]): Type = {
     pf.applyOrElse(this, identity[Type])
       .mapChildren(_.transformDown(pf))
   }
@@ -424,4 +475,3 @@ while(rows.hasNext()) {
     La génération de code nous permet d'avoir les performances d'un langage impératif avec la fléxibilité d'un langage orienté objet : mindblow !!
   </aside>
 </section>
-
