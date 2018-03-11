@@ -383,4 +383,45 @@ object CombineFilters extends Rule[LogicalPlan] {
 }
   </code></pre>
 </section>
+<section>
+  <h2>Ok mais où est la génération de code ?</h2>
+</section>
+<section>
+  <h2>Volcano model</h2>
+  <div>1 opérateur = 1 classe</div>
+  <div>1 opérateur = 1 appel à une fonction virtuelle</div>
+  <div>On perd le pipelining</div>
+</section>
+<section>
+  <div>En fait, un bout de code écrit à la main va beaucoup plus vite</div>
+  <pre class="bigger-code java"><code data-trim data-noescape>
+while(rows.hasNext()) {
+  Row currentRow = rows.next();
+  if(currentRow.get("age") > 18)
+    return currentRow.get("name");
+}
+  </code></pre>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+    Project("name",
+      Filter(
+        Expression("age", greaterThan(18)),
+        CsvScan("people.csv")
+      )
+    )
+  </code></pre>
+</section>
+<section>
+  <h2>Spark introduit le <code>WholeStageCodegen</code></h2>
+  <div>1 classe = n opérateurs</div>
+</section>
+<section>
+  <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
+</section>
+<section>
+  <h3>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</h3>
+  <div class="fragment">La génération de code !!</div>
+  <aside class="notes">
+    La génération de code nous permet d'avoir les performances d'un langage impératif avec la fléxibilité d'un langage orienté objet : mindblow !!
+  </aside>
+</section>
 
