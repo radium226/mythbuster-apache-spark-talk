@@ -6,6 +6,12 @@
 </section>
 
 <section>
+  <aside class="notes">
+Qui sommes nous ?
+  </aside>
+</section>
+
+<section>
   <img src="./images/apache-spark-logo.svg" />
   <h2>Qu'est-ce que c'est ?</h2>
 </section>
@@ -61,6 +67,12 @@
 def compile(code: String): Class[_] = ???
   </code></pre>
   <h3 class="fragment">Essayons !</h3>
+</section>
+
+<section>
+  <aside class="notes">
+Tout ce que l'on vous dit, on l'a fait en vrai : c'est sur notre GitLab
+  </aside>
 </section>
 
 <section>
@@ -157,7 +169,7 @@ println(myTalker.talk())
 <section>
   <h3>MythBuster: Apache Spark</h3>
   <img src="./images/mythbuster-apache-spark-logo.png" />
-  <p>Où comment passer 6 mois à décortiquer le code d'<em>Apache Spark</em>&hellip;</p>
+  <p>Ou comment décortiquer le code d'<em>Apache Spark</em> pour comprendre ce qui se passe&hellip;</p>
 </section>
 
 <section>
@@ -319,15 +331,16 @@ case class Filter(
   <h4>Le <em>Volcano Model</em></h4>
   <p>Un peu d'histoire&nbsp;:</p>
   <ul>
-    <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;</li>
-    <li>La quasi-totalité des SGBDR s'appuient sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;</li>
-    <li><em>Push</em> de la donnée&nbsp;</li>
+    <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
+    <li>La quasi-totalité des SGBDR s'appuient sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;;</li>
+    <li>On <em>pull</em> la donnée&nbsp;;</li>
     <li>Un opérateur&nbsp;&harr;&nbsp;Une classe. </li>
   </ul>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait PhysicalPlan {
 
   def execute(): Iterator[Row]
+
 }
   </code></pre>
 </section>
@@ -335,7 +348,7 @@ trait PhysicalPlan {
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Filter(
-  child: PhysicalPlan, predicate: Expression with Predicate
+  child: PhysicalPlan, predicate: Predicate
 ) extends PhysicalPlan {
 
   override def execute() : Iterator[Row] = {
@@ -353,7 +366,7 @@ case class CSVFileFullScan(
 case class NestedLoopJoin(
   leftChild: PhysicalPlan,
   rightChild: PhysicalPlan,
-  predicate: Expression with Predicate
+  predicate: Predicate
 ) extends PhysicalPlan
 
 // Etc.
@@ -361,6 +374,7 @@ case class NestedLoopJoin(
 </section>
 
 <section>
+  <img src="./images/volcano-model.png" />
   <aside class="notes">
     Image du volcano model <br />
     Classe qui s'imbriquent
@@ -368,110 +382,15 @@ case class NestedLoopJoin(
 </section>
 
 <section>
-  <img src="./images/résumé.png" />
-  <aside class="notes">
-
-  </aside>
-</section>
-
-<section>
-  <h3>Optimisation</h3>
-  <p>Objectif&nbsp;:</p>
-  <ul>
-
-    <li>Au sein d'<em>Apache Spark</em>, le moteur d'execution s'appelle <em>Catalyst</em>. </li>
-  </ul>
-  <aside class="notes">
-Définition +
-
-  </aside>
-</section>
-
-<section>
-  <h2>Quelques optimisations dans Spark</h2>
-  <ul>
-    <li><code>PushDownPredicate</code></li>
-    <li><code>ColumnPruning</code></li>
-    <li><code>CombineFilters</code></li>
-  </ul>
-</section>
-<section>
-  <img src="./images/catalystExample.png" style="background:none; border:none; box-shadow:none;"/>
-</section>
-<section>
-  <h2>Une structure en arbre idéale pour agencer et optimiser le plan d'exécution</h2>
-</section>
-<section>
-  <h2>Définition d'un <em>Trait</em></h2>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-trait TreeNode[Type <: TreeNode[Type]] {
-                       self: Type =>
-
-  def children: Seq[Type]
-
-  def copyWithNewChildren(children: Seq[Type]): Type = ???
-
-  def mapChildren(f: Type => Type): Type = {
-    copyWithNewChildren(children.map(f))
+  <h3>Du côté d'<em>Apache Spark</em>&hellip;</h3>
+  <p>C'est exactement la même chose, sauf que&hellip;</p>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+final def execute(): <mark>RDD[InternalRow]</mark> = executeQuery {
+  if (isCanonicalizedPlan) {
+    throw new IllegalStateException("A canonicalized plan is not supposed to be executed.")
   }
-
-  def transform(pf: PartialFunction[Type, Type]): Type = {
-    pf.applyOrElse(this, identity[Type])
-      .mapChildren(_.transformDown(pf))
-  }
-
+  doExecute()
 }
   </code></pre>
-</section>
-<section>
-  <h2>Exemple d'optimisation</h2>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-object CombineFilters extends Rule[LogicalPlan] {
-  def apply(plan: LogicalPlan): LogicalPlan = plan transform {
-    case Filter(exp1, Filter(exp2, grandChild)) =>
-          Filter(And(exp1, exp2), grandChild)
-  }
-}
-  </code></pre>
-</section>
-<section>
-  <h2>Ok mais où est la génération de code ?</h2>
-</section>
-<section>
-  <h2>Volcano model</h2>
-  <div>1 opérateur = 1 classe</div>
-  <div>1 opérateur = 1 appel à une fonction virtuelle</div>
-  <div>On perd le pipelining</div>
-</section>
-<section>
-  <div>En fait, un bout de code écrit à la main va beaucoup plus vite</div>
-  <pre class="bigger-code java"><code data-trim data-noescape>
-while(rows.hasNext()) {
-  Row currentRow = rows.next();
-  if(currentRow.get("age") > 18)
-    return currentRow.get("name");
-}
-  </code></pre>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-    Project("name",
-      Filter(
-        Expression("age", greaterThan(18)),
-        CsvScan("people.csv")
-      )
-    )
-  </code></pre>
-</section>
-<section>
-  <h2>Spark introduit le <code>WholeStageCodegen</code></h2>
-  <div>1 classe = n opérateurs</div>
-</section>
-<section>
-  <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
-</section>
-<section>
-  <h3>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</h3>
-  <div class="fragment">La génération de code !!</div>
-  <aside class="notes">
-    La génération de code nous permet d'avoir les performances d'un langage impératif avec la fléxibilité d'un langage orienté objet : mindblow !!
-  </aside>
+  <p class="fragment">&hellip;On retrouve l'abstraction <code>RDD[_]</code>&nbsp;!</p>
 </section>
