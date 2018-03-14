@@ -52,13 +52,35 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section data-external="slides/lundi.html"></section>
-				<section data-external="slides/vendredi.html"></section>
+				<section data-external="slides/présentation.html"></section>
 				<section data-external="slides/introduction.html"></section>
-				<section data-external="slides/tree-node.html"></section>
-				<section data-external="slides/optimisations-1.html"></section>
 				<section data-external="slides/génération-de-code.html"></section>
-				<section>Slide 2</section>
+				<section>
+				  <h2>MythBuster: Apache Spark</h2>
+				  <img src="./images/mythbuster-apache-spark-logo.png" />
+				  <p>Ou comment décortiquer le code d'<em>Apache Spark</em> pour comprendre ce qui se passe&hellip;</p>
+				</section>
+				<section>
+				  <h2><em>Back To Basics...</em></h2>
+				  <p>Comment <em>Apache Spark</em> exécute une requête SQL&nbsp;?</p>
+				  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+				def execute(sql: String): Seq[Row] = ???
+				  </code></pre>
+				  <aside class="notes">
+				    Retour au point de départ : on a une String, co
+				  </aside>
+				</section>
+				<section data-external="slides/parsing.html"></section>
+				<section data-external="slides/exécution.html"></section>
+				<section>
+				  <img src="./images/résumé.png" />
+				  <aside class="notes">
+				Schéma qui résume tout de A à Z : on est au milieu de la prez, voilà tout ce que l'on vient de faire
+				  </aside>
+				</section>
+				<section data-external="slides/optimisation.html"></section>
+				<section data-external="slides/wholestagecodegen.html"></section>
+				<section data-external="slides/conclusion.html"></section>
 			</div>
 		</div>
 		<script src="js/reveal.js"></script>

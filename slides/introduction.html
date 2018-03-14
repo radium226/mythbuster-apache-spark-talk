@@ -1,11 +1,40 @@
 <section>
-  <div style="text-align: left; float: left;">
-    <h1>Spark en 2 mots</h1>
-    <p>Big Data</p>
-  </div>
-</section>
-<section>
-  <h1>Au départ Mesos</h1>
-  <h1>Aujourd'hui projet à part entière</h1>
+  <img src="./images/apache-spark-logo.svg" />
+  <h2>Qu'est-ce que c'est ?</h2>
 </section>
 
+<section>
+  <h3>En résumé, <em>Apache Spark</em>&nbsp;:</h3>
+  <ul>
+    <li>Est un <strong>framework de calcul distribué</strong> <em>In Memory</em>&nbsp;;</li>
+    <li>Qui est <strong>tolérant à la panne</strong>&nbsp;;</li>
+    <li>Se base sur des <strong>abstractions</strong> de plusieurs niveaux (<code>RDD[_]</code>, <code>DataFrame</code>, etc.)&nbsp;;</li>
+    <li>Permet l'<strong>utilisation du SQL</strong> sur des sources de données hétérogènes. </li>
+  </ul>
+  <aside class="notes">
+    Schéma d'un ETL distribué
+  </aside>
+</section>
+
+<section>
+  <h3>Le projet <em>Tungsten</em></h3>
+  <ul>
+    <li>Initié à partir d'<em>Apache Spark</em> 1.4&nbsp;;</li>
+    <li>Ayant pour objectif une <strong>amélioration des performances</strong> sans changement de l'API&nbsp;;</li>
+    <li><blockquote>CPU is the new bottlneck</blockquote>&nbsp;;</li>
+    <li>Depuis <em>Apache Spark</em> 2.0, <strong>génération de code</strong> à la volée. </li>
+  </ul>
+  <aside class="notes">
+    Schéma avec SELECT<br />
+    Suite aux bench de Databricks : CPU is the bottelneck
+  </aside>
+</section>
+
+<section>
+  <img src="./images/wait-a-minute.jpg" />
+  <aside class="notes">
+    Image WTF ? <br />
+    Pour bien comprendre, on farfouille dans Spark <br />
+    Qu'est ce que ça veut dire génération de code à la volée ?
+  </aside>
+</section>

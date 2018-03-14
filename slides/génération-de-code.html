@@ -1,115 +1,86 @@
 <section>
-  <h1>Interlude • La génération de code</h1>
+  <h2>Générer du code à la volée ?</h2>
+  <p>Challenge Accepted! </p>
 </section>
 
 <section>
+  <h3>De quoi parle-t-on exactement ?</h3>
+  <ul>
+    <li>Compiler un code <strong>pendant l'exécution</strong>&nbsp;;</li>
+    <li>Partir d'un <code>String</code> pour récupérer une <code>Class[_]</code>&nbsp;;</li>
+  </ul>
   <pre class="bigger-code scala"><code data-trim data-noescape>
-case class JavaClassSource(
-  name: JavaClassName, code: JavaClassCode
-) {
-
-  def writeCodeTo(folderPath: Path): Try[Path] = ???
-
-}
+def compile(code: String): Class[_] = ???
   </code></pre>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-trait JavaClassCompiler {
+  <h3 class="fragment">Essayons !</h3>
+</section>
 
-  def compile(javaClassSource: JavaClassSource): Try[Class[_]]
-
-}
-    </code></pre>
+<section>
+  <h3>
+    <a href="https://gitlab.octo.com/abesnard/myth-buster-spark">https://gitlab.octo.com/abesnard/myth-buster-spark</a>
+  </h3>
+  <aside class="notes">
+Tout ce que l'on vous dit, on l'a fait en vrai : c'est sur notre GitLab
+  </aside>
 </section>
 
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
-object JavacJavaClassCompiler extends JavaClassCompiler {
-
-  override def compile(source: JavaClassSource): Try[Class[_]] = {
-    val classFolderPath = Files
-      .createTempDirectory("generated-classes")
-    val sourceFolderPath = Files
-      .createTempDirectory("generated-sources")
-
-    for {
-      sourceFilePath <- source
-                          .writeCodeTo(sourceFolderPath)
-      _ <- javac(sourceFilePath, classFolderPath)
-      loadedClass <- loadClass(javaClassSource, classFolderPath)
-    } yield loadedClass
-  }
-
-}
-  </code></pre>
-</section>
-
-<section>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-def javac(classSourceFilePath: Path,
-          classFolderPath: Path): Try[String] = {
-  val output = new StringBuilder
-  val appendToOutput: (String => Unit) = { line =>
-    output.append(s"$line\n")
-  }
-  val processLogger = ProcessLogger(
-    appendToOutput,
-    appendToOutput
-  )
-  Seq(
-    "javac", "-verbose",
-    "-cp", javaClassPath().map(_.toString)
-             .mkString(pathSeparator),
-    "-d", classFolderPath.toString,
-    classSourceFilePath.toString
-  ) ! processLogger match {
-    case statusCode if statusCode == 0 =>
-      Success(stdout.toString)
-    case _ =>
-      Failure(new JavaClassCompilerException(output.toString))
-  }
-}
-  </code></pre>
-</section>
-
-<section>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-def loadClass(javaClassSource: JavaClassSource,
-              classFolderPath: Path): Try[Class[_]] = {
-  Try {
-    val parentClassLoader = getClass.getClassLoader
-    val classFolderURL = classFolderPath.toUri.toURL
-    val classLoader = new URLClassLoader(
-      Array(classFolderURL),
-      parentClassLoader
-    )
-    classLoader.loadClass(javaClassSource.name)
-  }
-}
-  </code></pre>
-</section>
-
-<section>
-  <pre class="bigger-code java"><code data-trim data-noescape>
-    package demo;
-
-    public interface Talker {
-
-        String talk();
-
-    }
-  </code></pre>
-</section>
-
-<section>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-val classCode: JavaClassCode =
-    """package demo;
+val javaClassCode =
+    """public class Talker {
       |
-      |public class TalkerImpl implements Talker {
-      |
-      | public TalkerImpl() {
-      |   super();
+      | public String talk() {
+      |   return "Hello, World! ";
       | }
+      |
+      |}
+      |
+    """.stripMargin
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+import sys.process._
+
+Seq(
+  "javac",
+  "-d", "/tmp/generated-sources",
+  "/tmp/generated-classes"
+) !
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+val classLoader = new URLClassLoader("/tmp/generated-classes")
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+val myTalker = classLoader
+  .loadClass("Talker")
+  .newInstance()
+myTalker.talk()
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+// Cannot resolve symbol talk
+  </code></pre>
+</section>
+
+<section>
+  <h3>Ouch! </h3>
+  <p>Le type de <code>myTalker</code> n'est pas défini à la compilation !</p>
+  <p>Il nous faut un <strong>pont</strong> entre le <em>Compile Time</em> et le <em>Run Time</em>&hellip; </p>
+  <pre class="bigger-code java fragment"><code data-trim data-noescape>
+public interface Talker {
+    String talk();
+}
+  </code></pre>
+  <aside class="notes">
+    Pourquoi Java ? On a voulu faire comme Spark : c'est plus rapide à compiler, et en plus avec Janino, c'est stylé parce que c'est tout en mémoire.
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+  val javaClassCode =
+    """public class GeneratedTalker implements Talker {
       |
       | @Override
       | public String talk() {
@@ -120,18 +91,25 @@ val classCode: JavaClassCode =
       |
     """.stripMargin
   </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+val myTalker: Talker = classLoader
+  .loadClass("HelloTalker")
+  .newInstance()
+  .asInstanceOf[Talker]
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+println(myTalker.talk())
+// "Hello World !"
+  </code></pre>
 </section>
 
 <section>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-val classSource = JavaClassSource("demo.TalkerImpl", classCode)
-classSource.compile().foreach({ compiledClass =>
-  val talker = compiledClass.newInstance()
-                 .asInstanceOf[Talker]
+  <img src="./images/compileJava.png" style="background:none; border:none; box-shadow:none;"/>
+</section>
 
-  println(talker.talk())
-})
-
-// Hello, World!
-  </code></pre>
+<section>
+  <img src="./images/so-what-2.png" />
+  <aside class="notes">
+    Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ?
+  </aside>
 </section>

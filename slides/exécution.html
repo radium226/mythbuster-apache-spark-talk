@@ -1,0 +1,115 @@
+<section>
+  <h2>Exécution de la requête SQL</h2>
+  <p>Deux étapes&nbsp;</p>
+  <img src="?" />
+</section>
+
+<section>
+  <h3>Plan d'execution logique</h3>
+  <p>Quelles sont les étapes par lesquelles on va passer pour évaluer l'AST&nbsp;?</p>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+sealed trait LogicalPlan
+  </code></pre>
+  <aside class="notes">
+    Avec Spark, tu peux faire des jointures entre des sources de données hétérogène. <br />
+    D'un point de vue logique, tu fais des jointures entre table, mais d'un point de vue physique, tu vas faire une jointure entre CsvTable et une JdbcTable
+    On en reparlera plus tard, mais un join logique peut-être un hash Join ou un nested loop (suivant l'environnemtn dans lequel tu executes)
+    Le plan d'execution logique, il ne permet pas d'executer, c'est juste une vision algébrique de ta requête (c'est vraiment un plan)
+    Le plan physique, c'est vraiment l'execution (le marteau piqueur, celui qui rentre dans le dur)
+    Ça n'est absolument pas spécifique à Spark, c'est commun à toutes les base de données (Oracle, etc.)
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Projection(
+  child: LogicalPlan, expression: Seq[Expression]
+) extends LogicalPlan
+
+case class Join(
+  leftChild: LogicalPlan, rightChild: LogicalPlan,
+  expression: BinaryOperation
+) extends LogicalPlan
+
+case class Filter(
+  child: LogicalPlan,
+  expression: Expression
+) extends LogicalPlan
+
+// ...
+  </code></pre>
+  <p class="fragment">Purement déclaratif, toujours pas d'execution !</p>
+</section>
+
+<section>
+  <h3>Plan d'exécution physique</h3>
+  <p>Maintenant que l'on connait les étapes par lesquelles passées, comment est-ce qu'on les exécute&nbsp;?</p>
+</section>
+
+<section>
+  <h4>Le <em>Volcano Model</em></h4>
+  <p>Un peu d'histoire&nbsp;:</p>
+  <ul>
+    <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
+    <li>La quasi-totalité des SGBDR s'appuient sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;;</li>
+    <li>On <em>pull</em> la donnée&nbsp;;</li>
+    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe. </li>
+  </ul>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait PhysicalPlan {
+
+  def execute(): Iterator[Row]
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Filter(
+  child: PhysicalPlan, predicate: Predicate
+) extends PhysicalPlan {
+
+  override def execute() : Iterator[Row] = {
+    child.execute()
+      .filter(predicate.evaluate)
+  }
+
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+case class CSVFileFullScan(
+  csvFilePath: Path
+) extends PhysicalPlan
+
+case class NestedLoopJoin(
+  leftChild: PhysicalPlan,
+  rightChild: PhysicalPlan,
+  predicate: Predicate
+) extends PhysicalPlan
+
+// Etc.
+  </code></pre>
+</section>
+
+<section>
+  <img src="./images/volcano-model.png" />
+  <aside class="notes">
+    Image du volcano model <br />
+    Classe qui s'imbriquent
+  </aside>
+</section>
+
+<section>
+  <h3>Du côté d'<em>Apache Spark</em>&hellip;</h3>
+  <p>C'est exactement la même chose, sauf que&hellip;</p>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+final def execute(): <mark>RDD[InternalRow]</mark> = executeQuery {
+  if (isCanonicalizedPlan) {
+    throw new IllegalStateException("A canonicalized plan is not supposed to be executed.")
+  }
+  doExecute()
+}
+  </code></pre>
+  <p class="fragment">&hellip;On retrouve l'abstraction <code>RDD[_]</code>&nbsp;!</p>
+</section>

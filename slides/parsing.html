@@ -1,0 +1,97 @@
+<section>
+  <h2><em>Parsing</em> d'une reqête SQL</h2>
+  <p>Deux étapes&nbsp;:</p>
+  <img src="?" />
+  <aside class="notes">
+    Résumé de tout sous forme de schéma
+  </aside>
+</section>
+
+<section>
+  <h3>L'analyse lexicale</h3>
+  <img src="?" />
+  <aside class="notes">
+    Schéma avec un exemple de requête SQL
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+sealed trait Token
+
+case class Select() extends Token
+
+case class From() extends Token
+
+// ...
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+def lexer: String => Seq[Token] = ???
+  </code></pre>
+</section>
+
+<section>
+  <h3>L'analyse syntaxique</h3>
+  <img src="?" />
+  <aside class="notes">
+    Pareil, un schéma depuis les token vers l'AST
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait AST
+
+case class Table(name: String) extends AST
+
+case class Alias(table: Table, name: String) extends AST
+
+case class Select(
+  projections: Seq[Expression],
+  filter: Option[Expression],
+  relations: Seq[Table]
+) extends AST
+
+// ...
+
+trait Expression extends AST
+
+// ...
+  </code></pre>
+
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+def parser: Seq[Token] => AST
+  </code></pre>
+  <aside class="notes">
+    Le parser permet de donner un sens aux tokens : de hiérarchiser les tokens, et contextualiser tout ça. <br />
+    N'importe quel language utilise ça (y a un AST pour Java, pour Scala, etc.) y a rien de révolutionnaire et ça n'est pas du tout propre à Spark
+  </aside>
+</section>
+
+<section>
+  <h3>Implémentations</h3>
+  <div>
+    <div class="left-column">
+      <img src="./images/scala-logo.png" />
+      <h4 style="text-align: center;">Parser Combinators</h4>
+    </div>
+    <div class="right-column">
+      <img style="width: 50%; height: 50%;" src="./images/antlr-logo.jpg" />
+    </div>
+  </div>
+  <aside class="notes">
+    Logos de Parser Combinator et ANTLR <br />
+    Pour nous, les Parser Combinator s'était suffisant, mais ANTLR c'est plus sérieux pour des langages beaucoup plus complexes (type SQL ANSI, etc.)
+  </aside>
+</section>
+
+<section>
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
+  <ul>
+    <li>L'analyse lexicale transforme une chaîne de caractère en lexèmes appartenant au <strong>lexique du langage</strong>&nbsp;;</li>
+    <li>L'analyse syntaxique <strong>donne du sens</strong> à ces lexèmes en produisant un <em>AST</em>&nbsp;</li>
+    <li>L'<em>AST</em> est une structure exploitable par le code&nbsp;</li>
+    <li><strong>ANTLR est un standard</strong> pour des langages complexes, et c'est ce qu'utilise <em>Apache Spark</em>. </li>
+  </ul>
+  <p><span class="fragment">Notre requête SQL étant parsée&hellip; </span><span class="fragment">Il n'y plus qu'à l'executer&nbsp;!</span></p>
+</section>

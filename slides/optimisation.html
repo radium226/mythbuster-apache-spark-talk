@@ -1,12 +1,5 @@
 <section>
-  <img src="./images/résumé.png" />
-  <aside class="notes">
-Schéma qui résume tout de A à Z
-  </aside>
-</section>
-
-<section>
-  <h3>Optimisation</h3>
+  <h2>Optimisation</h2>
   <p>En deux mots&nbsp;:</p>
   <ul>
     <li>L'objectif est de <strong>réduire le temps d'execution</strong> sans changer le résultat&nbsp;;</li>
@@ -47,7 +40,7 @@ trait TreeNode[Type <: TreeNode[Type]] {
 </section>
 
 <section>
-  <h3>Ce qu'il faut retenir</h3>
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
   <ul>
     <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
     <li>la methode <code>transform</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
@@ -103,78 +96,9 @@ Project("name",
     </div>
   </div>
   <div style="clear: both;">
-    <p>&hellip;C'est beaucoup plus performant&nbsp;!</p>
+    <p>&hellip;Ça serait beaucoup plus performant&nbsp;!</p>
   </div>
   <aside class="notes">
 Mouais... M O U A I S... TU TE FOUTERAIS PAS UN DE MA GUEULE ??
-  </aside>
-</section>
-
-<section>
-  <h3><em>Apache Spark</em> introduit le <code>WholeStageCodegen</code></h3>
-  <p>Une classe &harr; <em>n</em> opérateurs</p>
-</section>
-
-<section>
-  <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
-</section>
-
-<section>
-  <h3>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</h3>
-</section>
-
-<section>
-  <h3>La génération de code !!</h3>
-  <aside class="notes">
-    La génération de code nous permet d'avoir les performances d'un langage impératif avec la fléxibilité d'un langage orienté objet : mindblow !!
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-Montrer le trait <code>SupportCodeGenreation</code> et <code>doGenretaeCode</code>
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-Example de code généré <br />
-Chacun des opérateurs génère un morceau de code <br />
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-    Example d'un debug de Spark pour avoir le plan d'execution (avec debug à true et tutti quanti)
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-Tout à l'heure, on l'a fait avec javac, mais Spark, il le fait avec Janino
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-Par contre : ça fait chier abec les UDF, ça ne marche qu'avec des oéprateurs à une seulle branche, voilà.
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-Benchmark + Si tu remplaces Spark 1.6 par Spark 2.2, normaement tu peux avoir jsuqu'à  10% de temps gagné sans changement d'API
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-Toutes les références (articles, liens vers Spark, etc.)
-  </aside>
-</section>
-
-<section>
-  <aside class="notes">
-Merci
   </aside>
 </section>

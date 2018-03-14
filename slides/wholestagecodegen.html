@@ -1,0 +1,101 @@
+<section>
+  <p><em>Apache Spark</em> introduit le&nbsp:</p>
+  <h2><code>WholeStageCodegen</code></h2>
+  <p>Une classe &harr; <em>n</em> opérateurs</p>
+</section>
+
+<section>
+  <img src="?" />
+  <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
+</section>
+
+<section>
+  <p>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</p>
+  <h3 class="fragment">La génération de code !!</h3>
+  <aside class="notes">
+    La génération de code nous permet d'avoir les performances d'un langage impératif avec la fléxibilité d'un langage orienté objet : mindblow !!
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+trait JavaCodeGenerationSupport {
+
+  def consumeJavaCode(
+    codeGenerationContext: JavaCodeGenerationContext,
+    rowVariableName: JavaCode
+  ): JavaCode = {
+    parent.doConsumeJavaCode(codeGenerationContext, rowVariableName)
+  }
+
+  protected def doConsumeJavaCode(
+    codeGenerationContext: JavaCodeGenerationContext,
+    rowVariableName: JavaCode
+  ): JavaCode
+
+// ...
+  </code></pre>
+
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Filter(child: PhysicalPlan, expression: e.Expression)
+  extends PhysicalPlan with JavaCodeGenerationSupport {
+
+  override def doConsumeJavaCode(
+    codeGenerationContext: c.JavaCodeGenerationContext,
+    rowVariableName: JavaCode
+  ): JavaCode = {
+    s"""
+       |if(!(${expression.generateJavaCode(rowVariableName)}))
+       |  continue;
+       |${consumeJavaCode(codeGenerationContext, rowVariableName)}
+      """.stripMargin
+  }
+
+// ...
+  </code></pre>
+  <aside class="notes">
+Montrer le trait <code>SupportCodeGenreation</code> et <code>doGenretaeCode</code>
+  </aside>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+TODO
+  </code></pre>
+  <aside class="notes">
+Example de code généré <br />
+Chacun des opérateurs génère un morceau de code <br />
+  </aside>
+</section>
+
+<section>
+  <h3>Et du côté de chez Spark&nbsp;?</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+val df = dlfjhkdjfh
+df.debugString
+  </code></pre>
+  <aside class="notes">
+    Example d'un debug de Spark pour avoir le plan d'execution (avec debug à true et tutti quanti)
+  </aside>
+</section>
+
+<section>
+  <div>
+    <div class="left-column">
+      <h3>C'est bien&hellip;</h3>
+    </div>
+    <div class="right-column">
+      <h3>Mais attention&nbsp;!</h3>
+    </div>
+  </div>
+  <aside class="notes">
+    C'est bien : JIT, pipelining, etc.
+Par contre : ça fait chier abec les UDF, ça ne marche qu'avec des oéprateurs à une seulle branche, voilà.
+  </aside>
+</section>
+
+<section>
+  <aside class="notes">
+Benchmark + Si tu remplaces Spark 1.6 par Spark 2.2, normaement tu peux avoir jsuqu'à  10% de temps gagné sans changement d'API
+  </aside>
+</section>
