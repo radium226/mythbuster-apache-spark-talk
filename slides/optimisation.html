@@ -1,4 +1,4 @@
-<section class="marc">
+<section>
   <h2>Optimisation</h2>
   <p>En deux mots&nbsp;:</p>
   <ul>
@@ -12,8 +12,8 @@ Définition +
   </aside>
 </section>
 
-<section class="marc">
-  <h3>Example d'optimisations dans <em>Apache Spark</em>&nbsp;:</h3>
+<section>
+  <h3>Exemple d'optimisations dans <em>Apache Spark</em>&nbsp;:</h3>
   <ul>
     <li>Le <code>PushDownPredicate</code> pour filter le plus rapidement possible&nbsp;</li>
     <li>Le <code>ColumnPruning</code> pour ignorer les colonnes inutiles lors d'un <code>SELECT *</code>&nbsp;;</li>
@@ -21,11 +21,11 @@ Définition +
   </ul>
 </section>
 
-<section class="marc">
+<section>
   <img src="./images/catalystExample.png" style="background:none; border:none; box-shadow:none;"/>
 </section>
 
-<section class="marc">
+<section>
   <h3>Comment appliquer ces transformations au travers du code&nbsp;?</h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait TreeNode[Type <: TreeNode[Type]] {
@@ -39,7 +39,16 @@ trait TreeNode[Type <: TreeNode[Type]] {
   </code></pre>
 </section>
 
-<section class="marc">
+<section>
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
+  <ul>
+    <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
+    <li>la methode <code>transform</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
+    <li>le <em>Pattern Matching</em> et les <em>Partial Functions</em> permettent d'avoir une syntaxe simple et claire lors de la définition de ces règles</li>
+  </ul>
+</section>
+
+<section>
   <h3>Implémentation du <code>CombineFilters</code></h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 object CombineFilters extends Rule[LogicalPlan] {
@@ -51,16 +60,7 @@ object CombineFilters extends Rule[LogicalPlan] {
   </code></pre>
 </section>
 
-<section class="marc">
-  <h3>Ce qu'il faut retenir&nbsp;:</h3>
-  <ul>
-    <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
-    <li>la methode <code>transform</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
-    <li>le <em>Pattern Matching</em> et les <em>Partial Functions</em> permettent d'avoir une syntaxe simple et claire lors de la définition de ces règles</li>
-  </ul>
-</section>
-
-<section class="marc">
+<section>
   <h3>C'est bien, mais&hellip;</h3>
   <ul>
     <li>Un opérateur &harr; Une classe&nbsp;;</li>
@@ -69,7 +69,7 @@ object CombineFilters extends Rule[LogicalPlan] {
   <p class="fragment">On perd le pipelining&nbsp;!</p>
 </section>
 
-<section class="marc">
+<section>
   <h3>Et si on l'écrivait à la main&hellip;</h3>
   <div>
     <div class="left-column">

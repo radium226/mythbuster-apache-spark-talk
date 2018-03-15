@@ -6,7 +6,7 @@
 
 <section class="adrien">
   <h3>Plan d'execution logique</h3>
-  <p>Quelles sont les étapes par lesquelles on va passer pour évaluer l'AST&nbsp;?</p>
+  <p>Par quelles étapes va-t-on passer pour évaluer l'AST&nbsp;?</p>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 sealed trait LogicalPlan
   </code></pre>
@@ -43,7 +43,7 @@ case class Filter(
 
 <section class="adrien">
   <h3>Plan d'exécution physique</h3>
-  <p>Maintenant que l'on connait les étapes par lesquelles passées, comment est-ce qu'on les exécute&nbsp;?</p>
+  <p>Maintenant que l'on sait par quelles étapes passer, comment est-ce qu'on les exécute&nbsp;?</p>
 </section>
 
 <section class="adrien">
@@ -51,7 +51,7 @@ case class Filter(
   <p>Un peu d'histoire&nbsp;:</p>
   <ul>
     <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
-    <li>La quasi-totalité des SGBDR s'appuient sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;;</li>
+    <li>La quasi-totalité des SGBDR s'appuie sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;;</li>
     <li>On <em>pull</em> la donnée&nbsp;;</li>
     <li>Un opérateur&nbsp;&harr;&nbsp;Une classe. </li>
   </ul>
