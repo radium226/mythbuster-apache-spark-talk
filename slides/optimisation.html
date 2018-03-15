@@ -40,15 +40,6 @@ trait TreeNode[Type <: TreeNode[Type]] {
 </section>
 
 <section>
-  <h3>Ce qu'il faut retenir&nbsp;:</h3>
-  <ul>
-    <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
-    <li>la methode <code>transform</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
-    <li>le <em>Pattern Matching</em> et les <em>Partial Functions</em> permettent d'avoir une syntaxe simple et claire lors de la définition de ces règles</li>
-  </ul>
-</section>
-
-<section>
   <h3>Implémentation du <code>CombineFilters</code></h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 object CombineFilters extends Rule[LogicalPlan] {
@@ -58,6 +49,15 @@ object CombineFilters extends Rule[LogicalPlan] {
   }
 }
   </code></pre>
+</section>
+
+<section>
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
+  <ul>
+    <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
+    <li>la methode <code>transform</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
+    <li>le <em>Pattern Matching</em> et les <em>Partial Functions</em> permettent d'avoir une syntaxe simple et claire lors de la définition de ces règles</li>
+  </ul>
 </section>
 
 <section>
