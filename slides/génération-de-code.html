@@ -1,9 +1,9 @@
-<section>
+<section class="adrien">
   <h2>Générer du code à la volée ?</h2>
   <p>Challenge Accepted! </p>
 </section>
 
-<section>
+<section class="adrien">
   <h3>De quoi parle-t-on exactement ?</h3>
   <ul>
     <li>Compiler un code <strong>pendant l'exécution</strong>&nbsp;;</li>
@@ -15,7 +15,7 @@ def compile(code: String): Class[_] = ???
   <h3 class="fragment">Essayons !</h3>
 </section>
 
-<section>
+<section class="adrien">
   <h3>
     <a href="https://gitlab.octo.com/abesnard/myth-buster-spark">https://gitlab.octo.com/abesnard/myth-buster-spark</a>
   </h3>
@@ -24,7 +24,7 @@ Tout ce que l'on vous dit, on l'a fait en vrai : c'est sur notre GitLab
   </aside>
 </section>
 
-<section>
+<section class="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val javaClassCode =
     """public class Talker {
@@ -51,7 +51,7 @@ val classLoader = new URLClassLoader("/tmp/generated-classes")
   </code></pre>
 </section>
 
-<section>
+<section class="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val myTalker = classLoader
   .loadClass("Talker")
@@ -63,7 +63,7 @@ myTalker.talk()
   </code></pre>
 </section>
 
-<section>
+<section class="adrien">
   <h3>Ouch! </h3>
   <p>Le type de <code>myTalker</code> n'est pas défini à la compilation !</p>
   <p>Il nous faut un <strong>pont</strong> entre le <em>Compile Time</em> et le <em>Run Time</em>&hellip; </p>
@@ -77,7 +77,7 @@ public interface Talker {
   </aside>
 </section>
 
-<section>
+<section class="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
   val javaClassCode =
     """public class GeneratedTalker implements Talker {
@@ -103,11 +103,11 @@ println(myTalker.talk())
   </code></pre>
 </section>
 
-<section>
+<section class="adrien">
   <img src="./images/compileJava.png" style="background:none; border:none; box-shadow:none;"/>
 </section>
 
-<section>
+<section class="adrien">
   <img src="./images/so-what-2.png" />
   <aside class="notes">
     Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ?

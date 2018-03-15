@@ -1,10 +1,10 @@
-<section>
+<section class="adrien">
   <h2>Exécution de la requête SQL</h2>
   <p>Deux étapes&nbsp;</p>
   <img src="./images/parsing_planning_optimisations.png" />
 </section>
 
-<section>
+<section class="adrien">
   <h3>Plan d'execution logique</h3>
   <p>Quelles sont les étapes par lesquelles on va passer pour évaluer l'AST&nbsp;?</p>
   <pre class="bigger-code scala"><code data-trim data-noescape>
@@ -20,7 +20,7 @@ sealed trait LogicalPlan
   </aside>
 </section>
 
-<section>
+<section class="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Projection(
   child: LogicalPlan, expression: Seq[Expression]
@@ -41,12 +41,12 @@ case class Filter(
   <p class="fragment">Purement déclaratif, toujours pas d'execution !</p>
 </section>
 
-<section>
+<section class="adrien">
   <h3>Plan d'exécution physique</h3>
   <p>Maintenant que l'on connait les étapes par lesquelles passées, comment est-ce qu'on les exécute&nbsp;?</p>
 </section>
 
-<section>
+<section class="adrien">
   <h4>Le <em>Volcano Model</em></h4>
   <p>Un peu d'histoire&nbsp;:</p>
   <ul>
@@ -64,7 +64,7 @@ trait PhysicalPlan {
   </code></pre>
 </section>
 
-<section>
+<section class="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Filter(
   child: PhysicalPlan, predicate: Predicate
@@ -92,7 +92,7 @@ case class NestedLoopJoin(
   </code></pre>
 </section>
 
-<section>
+<section class="adrien">
   <img src="./images/volcano-model.png" />
   <aside class="notes">
     Image du volcano model <br />
@@ -100,11 +100,11 @@ case class NestedLoopJoin(
   </aside>
 </section>
 
-<section>
+<section class="adrien">
   <h3>Du côté d'<em>Apache Spark</em>&hellip;</h3>
   <p>C'est exactement la même chose, sauf que&hellip;</p>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-final def execute(): <mark style="background-color: #ff79c2;">RDD[InternalRow]</mark> = executeQuery {
+final def execute(): <mark style="background-color: #ff79c2 ;">RDD[InternalRow]</mark> = executeQuery {
   if (isCanonicalizedPlan) {
     throw new IllegalStateException(
       "A canonicalized plan is not supposed to be executed."
@@ -116,7 +116,7 @@ final def execute(): <mark style="background-color: #ff79c2;">RDD[InternalRow]</
   <p class="fragment">&hellip;On retrouve l'abstraction <code>RDD[_]</code>&nbsp;!</p>
 </section>
 
-<section>
+<section class="adrien">
   <pre class="bigger-code sql"><code data-trim data-noescape>
 SELECT * FROM persons WHERE firstName = 'Adrien'
   </code></pre>

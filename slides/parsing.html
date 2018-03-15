@@ -1,4 +1,4 @@
-<section>
+<section class="marc">
   <h2><em>Parsing</em> d'une reqête SQL</h2>
   <p>Deux étapes&nbsp;:</p>
   <img src="./images/lexing_parsing.png" />
@@ -7,7 +7,7 @@
   </aside>
 </section>
 
-<section>
+<section class="marc">
   <h3>L'analyse lexicale</h3>
   <img src="./images/lexing.png" />
   <aside class="notes">
@@ -15,7 +15,7 @@
   </aside>
 </section>
 
-<section>
+<section class="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 sealed trait Token
 
@@ -30,7 +30,7 @@ def lexer: String => Seq[Token] = ???
   </code></pre>
 </section>
 
-<section>
+<section class="marc">
   <h3>L'analyse syntaxique</h3>
   <img src="./images/parsing.png" />
   <aside class="notes">
@@ -38,7 +38,7 @@ def lexer: String => Seq[Token] = ???
   </aside>
 </section>
 
-<section>
+<section class="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait AST
 
@@ -68,7 +68,7 @@ def parser: Seq[Token] => AST
   </aside>
 </section>
 
-<section>
+<section class="marc">
   <h3>Implémentations</h3>
   <div>
     <div class="left-column">
@@ -109,7 +109,7 @@ statement
   </aside>
 </section>
 
-<section>
+<section class="marc">
   <h3>Ce qu'il faut retenir&nbsp;:</h3>
   <ul>
     <li>L'analyse lexicale transforme une chaîne de caractère en lexèmes appartenant au <strong>lexique du langage</strong>&nbsp;;</li>
