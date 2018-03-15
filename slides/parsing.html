@@ -74,9 +74,33 @@ def parser: Seq[Token] => AST
     <div class="left-column">
       <img src="./images/scala-logo.png" />
       <h4 style="text-align: center;">Parser Combinators</h4>
+      <pre class="bigger-code scala"><code data-trim data-noescape>
+object Parser extends Parsers {
+
+  override type Elem = l.Token
+
+  def literal: Parser[e.Literal] =
+    { number | text }
+
+  def from = l.From()
+               ~> tables
+
+// ...
+      </code></pre>
     </div>
-    <div class="right-column">
-      <img style="width: 50%; height: 50%;" src="./images/antlr-logo.jpg" />
+    <div class="right-column fragment">
+      <img style="width: 50%; height: 50%;" src="./images/antlr-logo.png" />
+      <pre class="bigger-code"><code data-trim data-noescape>
+statement
+  : query
+  | USE db=identifier
+  | CREATE DATABASE
+    (IF NOT EXISTS)? identifier
+    (COMMENT comment=STRING)?
+      locationSpec?
+    (WITH DBPROPERTIES
+      tablePropertyList)
+      </code></pre>
     </div>
   </div>
   <aside class="notes">

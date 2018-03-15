@@ -5,7 +5,7 @@
 </section>
 
 <section>
-  <img src="?" />
+  <img style="width:50%; height: 50%;" src="./images/wholestagecodegen.png" />
   <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
 </section>
 
@@ -20,13 +20,6 @@
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait JavaCodeGenerationSupport {
-
-  def consumeJavaCode(
-    codeGenerationContext: JavaCodeGenerationContext,
-    rowVariableName: JavaCode
-  ): JavaCode = {
-    parent.doConsumeJavaCode(codeGenerationContext, rowVariableName)
-  }
 
   protected def doConsumeJavaCode(
     codeGenerationContext: JavaCodeGenerationContext,
@@ -58,7 +51,7 @@ Montrer le trait <code>SupportCodeGenreation</code> et <code>doGenretaeCode</cod
   </aside>
 </section>
 
-<section>
+<!--<section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 TODO
   </code></pre>
@@ -66,13 +59,39 @@ TODO
 Example de code généré <br />
 Chacun des opérateurs génère un morceau de code <br />
   </aside>
-</section>
+</section>-->
 
 <section>
   <h3>Et du côté de chez Spark&nbsp;?</h3>
+  <img src="./images/spark-ui.png" />
+</section>
+
+<section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
-val df = dlfjhkdjfh
-df.debugString
+spark
+  .sql("SELECT * FROM persons WHERE firstName = 'Adrien'")
+  .queryExecution.codegen()
+  </code></pre>
+  <pre class="bigger-code java fragment"><code data-trim data-noescape>
+/* 005 */ final class GeneratedIterator
+  extends org.apache.spark.sql.execution.BufferedRowIterator {
+// ...
+/* 021 */   public GeneratedIterator(Object[] references) {
+/* 022 */     this.references = references;
+/* 023 */   }
+// ...
+/* 040 */   protected void processNext() throws java.io.IOException {
+/* 041 */     while (inputadapter_input.hasNext() && !stopEarly()) {
+/* 042 */       InternalRow inputadapter_row =
+                  (InternalRow) inputadapter_input.next();
+/* 043 */       boolean inputadapter_isNull =
+                  inputadapter_row.isNullAt(0);
+/* 044 */       octo.example.Person inputadapter_value =
+                  inputadapter_isNull ?
+                    null :
+                    ((octo.example.Person)inputadapter_row
+                      .get(0, null));
+// ...
   </code></pre>
   <aside class="notes">
     Example d'un debug de Spark pour avoir le plan d'execution (avec debug à true et tutti quanti)
@@ -83,9 +102,19 @@ df.debugString
   <div>
     <div class="left-column">
       <h3>C'est bien&hellip;</h3>
+      <ul>
+        <li>On profite du JIT&nbsp;;</li>
+        <li>Il y a <em>Pipelining</em> des opérations&nbsp;;</li>
+        <li>Les temps d'execution son améliorés. </li>
+      </ul>
     </div>
-    <div class="right-column">
+    <div class="right-column fragment">
       <h3>Mais attention&nbsp;!</h3>
+      <ul>
+        <li>Ne fonctionne pas avec les UDF&nbsp;;</li>
+        <li>Ça ne marce qu'avec certains opérateurs&nbsp;;</li>
+        <li class="fragment">C'est difficile à débugguer. </li>
+      </ul>
     </div>
   </div>
   <aside class="notes">
@@ -95,6 +124,7 @@ Par contre : ça fait chier abec les UDF, ça ne marche qu'avec des oéprateurs 
 </section>
 
 <section>
+  <img style="height:75%; width: 75%;" src="./images/benchmark.png" />
   <aside class="notes">
 Benchmark + Si tu remplaces Spark 1.6 par Spark 2.2, normaement tu peux avoir jsuqu'à  10% de temps gagné sans changement d'API
   </aside>
