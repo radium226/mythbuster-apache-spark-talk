@@ -903,7 +903,9 @@
 			backgroundColor: slide.getAttribute( 'data-background-color' ),
 			backgroundRepeat: slide.getAttribute( 'data-background-repeat' ),
 			backgroundPosition: slide.getAttribute( 'data-background-position' ),
-			backgroundTransition: slide.getAttribute( 'data-background-transition' )
+			backgroundTransition: slide.getAttribute( 'data-background-transition' ),
+			backgroundClass: slide.getAttribute("data-background-class"),
+			speaker: slide.getAttribute("data-speaker")
 		};
 
 		var element = document.createElement( 'div' );
@@ -970,6 +972,14 @@
 					slide.classList.add( 'has-light-background' );
 				}
 			}
+		}
+
+		if (data.backgroundClass) {
+			element.className += " " + data.backgroundClass;
+		}
+
+		if (data.speaker) {
+			element.className += " speaker-" + data.speaker;
 		}
 
 		return element;

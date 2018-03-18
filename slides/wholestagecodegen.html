@@ -1,15 +1,19 @@
-<section class="marc">
+<section data-background-class="east-bay">
+  <h2>Génération dynamique d'un opérateur</h2>
+</section>
+
+<section data-speaker="marc">
   <p><em>Apache Spark</em> introduit le&nbsp:</p>
   <h2><code>WholeStageCodegen</code></h2>
   <p>Une classe &harr; <em>n</em> opérateurs</p>
 </section>
 
-<section class="marc">
+<section data-speaker="marc">
   <img style="width:50%; height: 50%;" src="./images/wholestagecodegen.png" />
   <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
 </section>
 
-<section class="marc">
+<section data-speaker="marc">
   <p>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</p>
   <h3 class="fragment">La génération de code !!</h3>
   <aside class="notes">
@@ -17,7 +21,7 @@
   </aside>
 </section>
 
-<section class="marc">
+<section data-speaker="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait JavaCodeGenerationSupport {
 
@@ -51,7 +55,7 @@ Montrer le trait <code>SupportCodeGenreation</code> et <code>doGenretaeCode</cod
   </aside>
 </section>
 
-<!--<section class="marc">
+<!--<section data-speaker="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 TODO
   </code></pre>
@@ -61,12 +65,12 @@ Chacun des opérateurs génère un morceau de code <br />
   </aside>
 </section>-->
 
-<section class="marc">
+<section data-speaker="marc">
   <h3>Et du côté de chez Spark&nbsp;?</h3>
   <img src="./images/spark-ui.png" />
 </section>
 
-<section class="marc">
+<section data-speaker="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 spark
   .sql("SELECT * FROM persons WHERE firstName = 'Adrien'")
@@ -98,7 +102,7 @@ spark
   </aside>
 </section>
 
-<section class="marc">
+<section data-speaker="marc">
   <div>
     <div class="left-column">
       <h3>C'est bien&hellip;</h3>
@@ -123,7 +127,7 @@ Par contre : ça fait chier abec les UDF, ça ne marche qu'avec des oéprateurs 
   </aside>
 </section>
 
-<section class="marc">
+<section data-speaker="marc">
   <img style="height:75%; width: 75%;" src="./images/benchmark.png" />
   <aside class="notes">
 Benchmark + Si tu remplaces Spark 1.6 par Spark 2.2, normaement tu peux avoir jsuqu'à  10% de temps gagné sans changement d'API

@@ -7,6 +7,8 @@
  */
 @import url(https://fonts.googleapis.com/css?family=News+Cycle:400,700);
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
+@import url(https://fonts.googleapis.com/css?family=Poppins:400,700,400italic,700italic);
+
 /*********************************************
  * GLOBAL STYLES
  *********************************************/
@@ -18,7 +20,7 @@ body {
   background-color: #fff; }
 
 .reveal {
-  font-family: "Lato", sans-serif;
+  font-family: "Arial", sans-serif;
   font-size: 36px;
   font-weight: normal;
   color: #000; }
@@ -44,7 +46,7 @@ body {
 .reveal h6 {
   margin: 0 0 50px 0;
   color: #000;
-  font-family: "News Cycle", Impact, sans-serif;
+  font-family: "Arial", Impact, sans-serif;
   font-weight: normal;
   line-height: 1.2;
   letter-spacing: normal;
@@ -295,3 +297,75 @@ body {
 .reveal section img {
   border: none;
   box-shadow: 0 0 0 transparent; }
+
+.reveal section[data-background-class='half-baked'] h2,
+.reveal section[data-background-class='east-bay'] h2,
+.reveal section[data-background-class='scooter'] h2,
+.reveal section[data-background-class='saffron-mango'] h2,
+.reveal section[data-background-class='mandy'] h2,
+.reveal section[data-background-class='mantis'] h2 {
+  text-transform: uppercase;
+  color: white;
+  font-weight: bold;
+}
+
+.reveal .half-baked {
+  background-color: rgb(138, 207, 207);
+  background-image: url('./images/half-baked-top.png'), url('./images/half-baked-bottom.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, bottom center;
+  background-size: contain, contain;
+}
+
+.reveal .east-bay {
+  background-color: rgb(62, 79, 119);
+  background-image: url('./images/east-bay-top.png'), url('./images/east-bay-bottom.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, bottom center;
+  background-size: contain, contain;
+}
+
+.reveal .scooter {
+  background-color: rgb(51, 191, 213);
+  background-image: url('./images/scooter-top.png'), url('./images/scooter-bottom.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, bottom center;
+  background-size: contain, contain;
+}
+
+.reveal .saffron-mango {
+  background-color: rgb(251, 195, 91);
+  background-image: url('./images/saffron-mango-top.png'), url('./images/saffron-mango-bottom.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, bottom center;
+  background-size: contain, contain;
+}
+
+.reveal .mandy {
+  background-color: rgb(236, 96, 104);
+  background-image: url('./images/mandy-top.png'), url('./images/mandy-bottom.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, bottom center;
+  background-size: contain, contain;
+}
+
+.reveal .mantis {
+  background-color: rgb(141, 198, 113);
+  background-image: url('./images/mantis-top.png'), url('./images/mantis-bottom.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, bottom center;
+  background-size: contain, contain;
+}
+
+.reveal ul {
+  list-style-type: none;
+}
+
+.reveal ul li {
+  background-image: url('./images/bullet-1.png');
+  background-repeat: no-repeat;
+  background-position: 0 50%;
+  background-size: 0.75em;
+  padding-left: 1.25em;
+  margin-bottom: 0.5em;
+}

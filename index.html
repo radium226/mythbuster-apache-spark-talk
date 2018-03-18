@@ -48,33 +48,46 @@
 				text-align: center;
 			}
 
-			section.marc::after {
+			.small-left-column {
+				left: -8.33%;
+				text-align: left;
+				float: left;
+				width: 25%;
+				z-index: -10;
+				text-align: center;
+			}
+
+			.large-right-column {
+				left: 31.25%;
+				top: 75px;
+				float: right;
+				text-align: right;
+				z-index: -10;
+				width: 75%;
+				text-align: center;
+			}
+
+			.speaker-marc::after,
+			.speaker-adrien::after {
 			  content: "";
-				background-image: url('./images/marc.png');
 				background-repeat: no-repeat;
 				background-position: bottom right;
-				background-size: 50px 50px;
-			  opacity: 0.25;
+				background-size: 40px 40px;
+			  opacity: 0.5;
 			  top: 0;
 			  left: 0;
-			  bottom: 0;
-			  right: 0;
+			  bottom: 40px;
+			  right: 40px;
 			  position: absolute;
 			  z-index: -1;
 			}
-			section.adrien::after {
-			  content: "";
+
+			.speaker-marc::after {
+				background-image: url('./images/marc.png');
+			}
+
+			.speaker-adrien::after {
 				background-image: url('./images/adrien.png');
-				background-repeat: no-repeat;
-				background-position: bottom right;
-				background-size: 50px 50px;
-			  opacity: 0.25;
-			  top: 0;
-			  left: 0;
-			  bottom: 0;
-			  right: 0;
-			  position: absolute;
-			  z-index: -1;
 			}
 		</style>
 	</head>
@@ -84,12 +97,12 @@
 				<section data-external="slides/présentation.html"></section>
 				<section data-external="slides/introduction.html"></section>
 				<section data-external="slides/génération-de-code.html"></section>
-				<section class="adrien">
+				<section data-speaker="adrien">
 				  <h2>MythBuster: Apache Spark</h2>
 				  <img src="./images/mythbuster-apache-spark-logo.png" />
 				  <p>Ou comment décortiquer le code d'<em>Apache Spark</em> pour comprendre ce qui se passe&hellip;</p>
 				</section>
-				<section class="marc">
+				<section data-speaker="marc">
 				  <h2><em>Back To Basics...</em></h2>
 				  <p>Comment <em>Apache Spark</em> exécute une requête SQL&nbsp;?</p>
 				  <pre class="bigger-code scala fragment"><code data-trim data-noescape>

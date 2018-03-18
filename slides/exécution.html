@@ -1,10 +1,14 @@
-<section class="adrien">
+<section data-background-class="saffron-mango" data-talker="adrien">
+  <h2>Exécution d'un AST</h2>
+</section>
+
+<section data-speaker="adrien">
   <h2>Exécution de la requête SQL</h2>
   <p>Deux étapes&nbsp;</p>
   <img src="./images/parsing_planning_optimisations.png" />
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <h3>Plan d'execution logique</h3>
   <p>Par quelles étapes va-t-on passer pour évaluer l'AST&nbsp;?</p>
   <pre class="bigger-code scala"><code data-trim data-noescape>
@@ -20,7 +24,7 @@ sealed trait LogicalPlan
   </aside>
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Projection(
   child: LogicalPlan, expression: Seq[Expression]
@@ -41,12 +45,12 @@ case class Filter(
   <p class="fragment">Purement déclaratif, toujours pas d'execution !</p>
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <h3>Plan d'exécution physique</h3>
   <p>Maintenant que l'on sait par quelles étapes passer, comment est-ce qu'on les exécute&nbsp;?</p>
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <h4>Le <em>Volcano Model</em></h4>
   <p>Un peu d'histoire&nbsp;:</p>
   <ul>
@@ -64,7 +68,7 @@ trait PhysicalPlan {
   </code></pre>
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Filter(
   child: PhysicalPlan, predicate: Predicate
@@ -92,7 +96,7 @@ case class NestedLoopJoin(
   </code></pre>
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <img src="./images/volcano-model.png" />
   <aside class="notes">
     Image du volcano model <br />
@@ -100,7 +104,7 @@ case class NestedLoopJoin(
   </aside>
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <h3>Du côté d'<em>Apache Spark</em>&hellip;</h3>
   <p>C'est exactement la même chose, sauf que&hellip;</p>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -116,7 +120,7 @@ final def execute(): <mark style="background-color: #ff79c2 ;">RDD[InternalRow]<
   <p class="fragment">&hellip;On retrouve l'abstraction <code>RDD[_]</code>&nbsp;!</p>
 </section>
 
-<section class="adrien">
+<section data-speaker="adrien">
   <pre class="bigger-code sql"><code data-trim data-noescape>
 SELECT * FROM persons WHERE firstName = 'Adrien'
   </code></pre>
