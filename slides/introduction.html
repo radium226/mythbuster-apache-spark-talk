@@ -1,22 +1,43 @@
-<!--<section data-background-class="half-baked" data-speaker="adrien">
-  <img src="./images/apache-spark-logo.svg" />
-  <h2>Qu'est-ce que c'est ?</h2>
-</section>-->
 <section data-background-class="mandy">
   <h2>Aperçu d'<em>Apache Spark</em></h2>
+</section>
+
+<section data-speaker="adrien">
+  <img src="./images/apache-spark-logo.svg" />
+  <aside class="notes">
+Disclaimer : Apache Spark, c'est pas grave et on va y aller doucement.
+Apache Spark, c'est créé par DataBricks
+  </aside>
 </section>
 
 <section data-speaker="adrien">
   <h3>En résumé, <em>Apache Spark</em>&nbsp;:</h3>
   <ul>
     <li>Est un <strong>framework de calcul distribué</strong> <em>In Memory</em>&nbsp;;</li>
-    <li>Qui est <strong>tolérant à la panne</strong>&nbsp;;</li>
-    <li>Se base sur des <strong>abstractions</strong> de plusieurs niveaux (<code>RDD[_]</code>, <code>DataFrame</code>, etc.)&nbsp;;</li>
+    <li>Se base sur un <em>Cluster</em> avec certains noeuds qui <strong>orchestrent</strong> et d'autres <strong>exécutent</strong>&nbsp;;</li>
+    <li>Qui lance des <strong>Jobs</strong> qui sont <strong>tolérants à la panne</strong>&nbsp;;</li>
+    <li>Se base sur des <strong>abstractions</strong> de plusieurs niveaux&nbsp;;</li>
     <li>Permet l'<strong>utilisation du SQL</strong> sur des sources de données hétérogènes. </li>
   </ul>
   <aside class="notes">
     Schéma d'un ETL distribué
   </aside>
+</section>
+
+<section>
+  <h3>Abstractions principales</h3>
+  <ul>
+     <li>Les <code>RDD[_]</code>&nbsp;: un <code>Iterator[_]</code> distribué et résilient&nbsp;;</li>
+  </ul>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+    val myRDD = TA CHATTE
+  </code></pre>
+  <ul>
+     <li>Les <code>DataFrame</code>&nbsp; qui permettent d'avoir un DSL équivalent au SQL pour manipuler les données structurées.</li>
+  </ul>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+    val myDF = TA CHATTE
+  </code></pre>
 </section>
 
 <section data-speaker="adrien">

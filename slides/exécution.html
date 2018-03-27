@@ -51,13 +51,13 @@ case class Filter(
 </section>
 
 <section data-speaker="adrien">
-  <h4>Le <em>Volcano Model</em></h4>
-  <p>Un peu d'histoire&nbsp;:</p>
+  <h3>Le <em>Volcano Model</em></h3>
   <ul>
     <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
     <li>La quasi-totalité des SGBDR s'appuie sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;;</li>
     <li>On <em>pull</em> la donnée&nbsp;;</li>
-    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe. </li>
+    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe&nbsp;:</li>
+    <li>Basé sur ce papier de 1994&nbsp;: <a href="https://paperhub.s3.amazonaws.com/dace52a42c07f7f8348b08dc2b186061.pdf">Volcano &#x2014; An Extensible and Parallel Query Evaluation System</a>. </li>
   </ul>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait PhysicalPlan {

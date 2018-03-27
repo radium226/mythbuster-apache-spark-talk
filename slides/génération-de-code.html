@@ -8,7 +8,7 @@
     <li>Compiler un code <strong>pendant l'exécution</strong>&nbsp;;</li>
     <li>Partir d'un <code>String</code> pour récupérer une <code>Class[_]</code>&nbsp;;</li>
   </ul>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 def compile(code: String): Class[_] = ???
   </code></pre>
   <h3 class="fragment">Essayons !</h3>
@@ -48,6 +48,10 @@ Seq(
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 val classLoader = new URLClassLoader("/tmp/generated-classes")
   </code></pre>
+  <aside class="notes">
+Bien expliquer qu'il n'y a rien de compliqué : il s'agit juste d'appeler un
+process externe exactement comme si l'on lançait la commande depuis le Terminal
+  </aside>
 </section>
 
 <section data-speaker="adrien">
