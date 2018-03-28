@@ -25,19 +25,46 @@ Apache Spark, c'est créé par DataBricks
 </section>
 
 <section>
-  <h3>Abstractions principales</h3>
-  <ul>
-     <li>Les <code>RDD[_]</code>&nbsp;: un <code>Iterator[_]</code> distribué et résilient&nbsp;;</li>
-  </ul>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-    val myRDD = TA CHATTE
-  </code></pre>
-  <ul>
-     <li>Les <code>DataFrame</code>&nbsp; qui permettent d'avoir un DSL équivalent au SQL pour manipuler les données structurées.</li>
-  </ul>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-    val myDF = TA CHATTE
-  </code></pre>
+  <h3>Les <code>RDD</code></h3>
+  <div>
+    <p>Les <code>RDD[_]</code>&nbsp;: un <code>Iterator[_]</code> distribué et résilient. </p>
+    <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+val speakers: Seq[Speaker] = ???
+val speakersRDD: RDD[Speaker] = sparkContext
+  .parallelize(speakers)
+speakersRDD
+  .filter({ speaker =>
+    Seq("Adrien", "Marc").contains(speaker.firstName)
+  })
+  .map(_.lastName)
+  .saveAsTextFile("MythBuster.txt")
+    </code></pre>
+  </div>
+</section>
+
+<section>
+  <h3>Les <code>DataFrames</code></h3>
+  <div>
+    <p>Les <code>DataFrame</code>&nbsp; qui permettent d'avoir un DSL équivalent au SQL pour manipuler les données structurées.</p>
+    <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+val speakersDF = speakersRDD.toDF()
+speakersDF
+  .select($"firstName")
+  .where($"lastName" === "Alonso")
+  .show()
+    </code></pre>
+  </div>
+</section>
+
+<section>
+  <h3>Le SQL</h3>
+  <div>
+    <p>Le SQL qui permet de se rapprocher des SGBDR classiques</p>
+    <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+speakersDF.createOrReplaceTempView("persons")
+spark.sql("SELECT * FROM persons WHERE lastName = 'Alonso'").show()
+    </code></pre>
+  </div>
 </section>
 
 <section data-speaker="adrien">
