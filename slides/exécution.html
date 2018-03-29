@@ -1,11 +1,10 @@
 <section data-background-class="saffron-mango" data-talker="adrien">
-  <h2>Exécution d'un AST</h2>
+  <h2>Exécution de la rquête SQL</h2>
 </section>
 
-<section data-speaker="adrien">
-  <h2>Exécution de la requête SQL</h2>
-  <p>Deux étapes&nbsp;</p>
-  <img src="./images/parsing_planning_optimisations.png" />
+<section>
+  <h3>De l'<em>AST</em> au <code>LogicalPlan</code>&hellip;</h3>
+  <img src="./images/ast-vs-logicalplan.png" />
 </section>
 
 <section data-speaker="adrien">
@@ -51,12 +50,12 @@ case class Filter(
 </section>
 
 <section data-speaker="adrien">
-  <h3>Le <em>Volcano Model</em></h3>
+  <h3>Le <em>Volcano Model</em>&nbsp;:</h3>
   <ul>
     <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
     <li>La quasi-totalité des SGBDR s'appuie sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;;</li>
     <li>On <em>pull</em> la donnée&nbsp;;</li>
-    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe&nbsp;:</li>
+    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe&nbsp;;</li>
     <li>Basé sur ce papier de 1994&nbsp;: <a href="https://paperhub.s3.amazonaws.com/dace52a42c07f7f8348b08dc2b186061.pdf">Volcano &#x2014; An Extensible and Parallel Query Evaluation System</a>. </li>
   </ul>
   <pre class="bigger-code scala"><code data-trim data-noescape>
@@ -129,14 +128,6 @@ SELECT * FROM persons WHERE firstName = 'Adrien'
 'Project [*]
 +- 'Filter ('firstName = Adrien)
    +- 'UnresolvedRelation `persons`
-
-== Analyzed Logical Plan ==
-id: int, firstName: string, lastName: string
-Project [id#4, firstName#5, lastName#6]
-+- Filter (firstName#5 = Adrien)
-   +- SubqueryAlias persons
-      +- SerializeFromObject (...)
-         +- ExternalRDD [obj#3]
 
 == Optimized Logical Plan ==
 Filter (isnotnull(firstName#5) && (firstName#5 = Adrien))

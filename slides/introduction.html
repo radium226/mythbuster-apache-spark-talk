@@ -14,10 +14,9 @@ Apache Spark, c'est créé par DataBricks
   <h3>En résumé, <em>Apache Spark</em>&nbsp;:</h3>
   <ul>
     <li>Est un <strong>framework de calcul distribué</strong> <em>In Memory</em>&nbsp;;</li>
-    <li>Se base sur un <em>Cluster</em> avec certains noeuds qui <strong>orchestrent</strong> et d'autres <strong>exécutent</strong>&nbsp;;</li>
+    <li>Dont certains noeuds <strong>orchestrent</strong> et d'autres <strong>exécutent</strong>&nbsp;;</li>
     <li>Qui lance des <strong>Jobs</strong> qui sont <strong>tolérants à la panne</strong>&nbsp;;</li>
-    <li>Se base sur des <strong>abstractions</strong> de plusieurs niveaux&nbsp;;</li>
-    <li>Permet l'<strong>utilisation du SQL</strong> sur des sources de données hétérogènes. </li>
+    <li>Se base sur des <strong>abstractions</strong> de niveaux différents. </li>
   </ul>
   <aside class="notes">
     Schéma d'un ETL distribué
@@ -45,7 +44,7 @@ speakersRDD
 <section>
   <h3>Les <code>DataFrames</code></h3>
   <div>
-    <p>Les <code>DataFrame</code>&nbsp; qui permettent d'avoir un DSL équivalent au SQL pour manipuler les données structurées.</p>
+    <p>Les <code>DataFrame</code> qui fournissent un DSL de manipulation des données structurées.</p>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 val speakersDF = speakersRDD.toDF()
 speakersDF
@@ -59,7 +58,7 @@ speakersDF
 <section>
   <h3>Le SQL</h3>
   <div>
-    <p>Le SQL qui permet de se rapprocher des SGBDR classiques</p>
+    <p>Le SQL qui permet de se réaliser des requêtes homogènes sur des sources de données hétérogènes.</p>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 speakersDF.createOrReplaceTempView("persons")
 spark.sql("SELECT * FROM persons WHERE lastName = 'Alonso'").show()

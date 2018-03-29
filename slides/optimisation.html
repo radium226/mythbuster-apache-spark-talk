@@ -18,7 +18,7 @@ Définition +
 <section>
   <h3>Exemple d'optimisations dans <em>Apache Spark</em>&nbsp;:</h3>
   <ul>
-    <li>Le <code>PushDownPredicate</code> pour filter le plus rapidement possible&nbsp;</li>
+    <li>Le <code>PushDownPredicate</code> pour filter le plus rapidement possible&nbsp;;</li>
     <li>Le <code>ColumnPruning</code> pour ignorer les colonnes inutiles lors d'un <code>SELECT *</code>&nbsp;;</li>
     <li>Le <code>CombineFilters</code> qui assemble deux filtres avec un <code>AND</code>. </li>
   </ul>
@@ -52,7 +52,7 @@ trait TreeNode[Type <: TreeNode[Type]] {
 </section>
 
 <section>
-  <h3>Implémentation du <code>CombineFilters</code></h3>
+  <h3>Implémentation du <code>CombineFilters</code>&nbsp;:</h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 object CombineFilters extends Rule[LogicalPlan] {
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
@@ -64,16 +64,7 @@ object CombineFilters extends Rule[LogicalPlan] {
 </section>
 
 <section>
-  <h3>C'est bien, mais&hellip;</h3>
-  <ul>
-    <li>Un opérateur &harr; Une classe&nbsp;;</li>
-    <li>Une classe &harr; Un appel à une fonction virtuelle&hellip;</li>
-  </ul>
-  <p class="fragment">On perd le pipelining&nbsp;!</p>
-</section>
-
-<section>
-  <h3>Et si on l'écrivait à la main&hellip;</h3>
+  <h3>Oui, mais&hellip;</h3>
   <div>
     <div class="left-column">
       <pre class="bigger-code java"><code data-trim data-noescape>
@@ -99,7 +90,7 @@ Project("name",
     </div>
   </div>
   <div style="clear: both;">
-    <p>&hellip;Ça serait beaucoup plus performant&nbsp;!</p>
+    <p>&hellip;Ecrire du code spécifique reste plus performant&nbsp;!</p>
   </div>
   <aside class="notes">
 Mouais... M O U A I S... TU TE FOUTERAIS PAS UN DE MA GUEULE ??
@@ -107,14 +98,12 @@ Mouais... M O U A I S... TU TE FOUTERAIS PAS UN DE MA GUEULE ??
 </section>
 
 <section>
-  <h3>Appels <em>Megamorphic</em></h3>
-
+  <h3>Une sombre histoire de <em>JIT</em>&nbsp;:</h3>
   <ul>
-    <li>Pour plus de détails&nbsp;: <a href="http://insightfullogic.com/2014/May/12/fast-and-megamorphic-what-influences-method-invoca/">Too Fast, Too Megamorphic: what influences method call performance in Java?</a>. </li>
+    <li>Un opérateur 	&rArr; une implémentation du <em>Trait</em> <code>PhysicalPlan</code>&nbsp;;</li>
+    <li>Invoquer la méthode <code>execute(...)</code> 	&rArr; Appel à une fonction virtuelle&nbsp;;</li>
+    <li>Trop d'implémentation &rArr; On est dans le cas <em>Megamorphic</em>&nbsp;;</li>
+    <li class="fragment">On casse le <em>Pipelining</em>. </li>
   </ul>
-</section>
-
-<section>
-  <h3><em>Pipelining</em> de la donnée</h3>
-  
+  <p class="fragment">Pour plus de détails&nbsp;: <a href="http://insightfullogic.com/2014/May/12/fast-and-megamorphic-what-influences-method-invoca/">Too Fast, Too Megamorphic: what influences method call performance in Java?</a>. </p>
 </section>

@@ -11,16 +11,11 @@
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 def compile(code: String): Class[_] = ???
   </code></pre>
-  <h3 class="fragment">Essayons !</h3>
+  <p class="fragment">Essayons !</p>
 </section>
 
 <section data-speaker="adrien">
-  <h3>
-    <a href="https://gitlab.octo.com/abesnard/myth-buster-spark">https://gitlab.octo.com/abesnard/myth-buster-spark</a>
-  </h3>
-  <aside class="notes">
-Tout ce que l'on vous dit, on l'a fait en vrai : c'est sur notre GitLab
-  </aside>
+  <img src="./images/compileJava.png" style="background:none; border:none; box-shadow:none;"/>
 </section>
 
 <section data-speaker="adrien">
@@ -96,7 +91,7 @@ public interface Talker {
   </code></pre>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 val myTalker: Talker = classLoader
-  .loadClass("HelloTalker")
+  .loadClass("GeneratedTalker")
   .newInstance()
   .asInstanceOf[Talker]
   </code></pre>
@@ -107,7 +102,12 @@ println(myTalker.talk())
 </section>
 
 <section data-speaker="adrien">
-  <img src="./images/compileJava.png" style="background:none; border:none; box-shadow:none;"/>
+  <h3>Du côté d'<em>Apache Spark</em>&nbsp;? </h3>
+  <img src="./images/janino.png" />
+  <p class="fragment">On fait la même chose... Mais en mémoire !</p>
+  <aside class="notes">
+    Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ?
+  </aside>
 </section>
 
 <section data-speaker="adrien">
