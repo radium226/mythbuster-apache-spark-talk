@@ -1,11 +1,21 @@
 <section data-background-class="mandy">
   <h2>Aperçu d'<em>Apache Spark</em></h2>
+  <aside class="notes">
+Avant de rentrer dans le coeur du sujet, remettons-nous tous à niveau
+  </aside>
 </section>
 
 <section data-speaker="adrien">
   <img src="./images/apache-spark-logo.svg" />
   <aside class="notes">
 Disclaimer : Apache Spark, c'est pas grave et on va y aller doucement.
+Pour ceux qui ne connaissent pas, Spark c'est un framework de calcul distribué : c'est écrit en Scala,
+on désinge des sources de données en entrée, un stockage en sortie,
+  et on définit des transformations entre les deux.
+Il existe plusieurs niveaux d'abstraction pour décrire les transformations :
+      - RDD : impératif
+      - Dataframe/SQL : déclaratif
+La donnée est récupéré
 Apache Spark, c'est créé par DataBricks
   </aside>
 </section>
@@ -58,7 +68,7 @@ speakersDF
 <section>
   <h3>Le SQL</h3>
   <div>
-    <p>Le SQL qui permet de se réaliser des requêtes homogènes sur des sources de données hétérogènes.</p>
+    <p>Le SQL qui permet de réaliser des requêtes homogènes sur des sources de données hétérogènes.</p>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 speakersDF.createOrReplaceTempView("persons")
 spark.sql("SELECT * FROM persons WHERE lastName = 'Alonso'").show()
