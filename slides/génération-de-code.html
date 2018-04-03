@@ -21,7 +21,7 @@ def compile(code: String): Class[_] = ???
 <section data-speaker="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val javaClassCode : String =
-    """public class Talker {
+    """public class GeneratedTalker {
       |
       | public String talk() {
       |   return "Hello, World! ";
@@ -52,7 +52,7 @@ process externe exactement comme si l'on lançait la commande depuis le Terminal
 <section data-speaker="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val myTalker = classLoader
-  .loadClass("Talker")
+  .loadClass("GeneratedTalker")
   .newInstance()
 myTalker.talk()
   </code></pre>

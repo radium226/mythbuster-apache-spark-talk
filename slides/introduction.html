@@ -34,33 +34,104 @@ Apache Spark, c'est créé par DataBricks
 </section>
 
 <section>
-  <h3>Les <code>RDD</code></h3>
+  <h3>Un petit example&nbsp;:</h3>
+  <div>
+    <div>
+      <p><code>employees.csv</code></p>
+      <table>
+        <thead>
+          <tr>
+            <th>firstName</th>
+            <th>lastName</th>
+            <th>companyId</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Adrien</td>
+            <td>Besnard</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>Marc</td>
+            <td>Alonso</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top: 1em;">
+      <p><code>companies.csv</code></p>
+      <table>
+        <thead>
+          <tr>
+            <th>name</th>
+            <th>id</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>OCTO</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h4>Les <code>RDD</code></h4>
   <div>
     <p>Les <code>RDD[_]</code>&nbsp;: un <code>Iterator[_]</code> distribué et résilient. </p>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-val speakers: Seq[Speaker] = ???
-val speakersRDD: RDD[Speaker] = sparkContext
-  .parallelize(speakers)
-speakersRDD
-  .filter({ speaker =>
-    Seq("Adrien", "Marc").contains(speaker.firstName)
-  })
-  .map(_.lastName)
-  .saveAsTextFile("MythBuster.txt")
+val employeesRDD = sparkContext.parallelize(Employee.sample)
+val companiesRDD = sparkContext.parallelize(Company.sample)
+
+val employeesByCompanyIdRDD = employeesRDD
+  .map({ e => (e.companyId, e) })
+
+val companiesByIdRDD = companiesRDD
+  .map({ c => (c.id, c) })
+
+val octoEmployees = employeesByCompanyIdRDD.join(companiesByIdRDD)
+  .map({ case (_, (e, c)) => (e, c) })
+  .filter({ case (e, c) => c.name == "OCTO" })
+  .map({ case (e, c) => (e.firstName, e.lastName) })
+
+octoEmployees.collect()
+  .foreach(println)
+    </code></pre>
+    <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+// (Marc,Alonso)
+// (Adrien,Besnard)
     </code></pre>
   </div>
 </section>
 
 <section>
-  <h3>Les <code>DataFrames</code></h3>
+  <h4>Les <code>DataFrames</code></h4>
   <div>
     <p>Les <code>DataFrame</code> qui fournissent un DSL de manipulation des données structurées.</p>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-val speakersDF = speakersRDD.toDF()
-speakersDF
-  .select($"firstName")
-  .where($"lastName" === "Alonso")
-  .show()
+val employeesDF = sparkSession.createDataFrame(Employee.sample)
+val companiesDF = sparkSession.createDataFrame(Company.sample)
+
+val resultDF = companiesDF
+  .join(
+    employeesDF,
+    $"companyId" === $"id"
+  )
+.select($"firstName", $"lastName")
+.where($"name" === "OCTO")
+    </code></pre>
+    <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+// +---------+--------+
+// |firstName|lastName|
+// +---------+--------+
+// |   Adrien| Besnard|
+// |     Marc|  Alonso|
+// +---------+--------+
     </code></pre>
   </div>
 </section>
@@ -70,8 +141,27 @@ speakersDF
   <div>
     <p>Le SQL qui permet de réaliser des requêtes homogènes sur des sources de données hétérogènes.</p>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-speakersDF.createOrReplaceTempView("persons")
-spark.sql("SELECT * FROM persons WHERE lastName = 'Alonso'").show()
+employeesDF.createOrReplaceTempView("employees")
+companiesDF.createOrReplaceTempView("companies")
+
+val resultDF = sparkSession.sql(
+  """
+    |SELECT firstName, lastName
+    |  FROM employees
+    |  JOIN companies
+    |    ON companyId = id
+    | WHERE name = 'OCTO'
+  """.stripMargin)
+
+resultDF.show()
+    </code></pre>
+    <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+// +---------+--------+
+// |firstName|lastName|
+// +---------+--------+
+// |   Adrien| Besnard|
+// |     Marc|  Alonso|
+// +---------+--------+
     </code></pre>
   </div>
 </section>
