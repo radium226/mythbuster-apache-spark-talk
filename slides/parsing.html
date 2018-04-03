@@ -116,9 +116,9 @@ statement
 <section data-speaker="marc">
   <h3>Ce qu'il faut retenir&nbsp;:</h3>
   <ul>
-    <li>L'analyse lexicale transforme une chaîne de caractères en lexèmes appartenant au <strong>lexique du langage</strong>&nbsp;;</li>
-    <li>L'analyse syntaxique <strong>donne du sens</strong> à ces lexèmes en produisant un <em>AST</em>&nbsp;</li>
-    <li>L'<em>AST</em> est une structure exploitable par le code&nbsp;</li>
+    <li>Une étape d'analyse lexicale : <code>String => Seq[Token]</code></li>
+    <li>Une étape d'analyse syntaxique : <code>Seq[Token] => AST</code></li>
+    <li>L'<em>AST</em> est une structure qui a du sens en termes de types : exploitable par le code</li>
     <li><strong>ANTLR est un standard</strong> pour des langages complexes, et c'est ce qu'utilise <em>Apache Spark</em>. </li>
   </ul>
   <p><span class="fragment">Notre requête SQL étant parsée&hellip; </span><span class="fragment">Il n'y plus qu'à l'executer&nbsp;!</span></p>

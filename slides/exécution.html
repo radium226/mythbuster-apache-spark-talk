@@ -50,14 +50,7 @@ case class Filter(
 </section>
 
 <section data-speaker="adrien">
-  <h3>Le <em>Volcano Model</em>&nbsp;:</h3>
-  <ul>
-    <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
-    <li>La quasi-totalité des SGBDR s'appuie sur ce fonctionnement (PostgreSQL, Oracle, MySQL, etc.)&nbsp;;</li>
-    <li>On <em>pull</em> la donnée&nbsp;;</li>
-    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe&nbsp;;</li>
-    <li>Basé sur ce papier de 1994&nbsp;: <a href="https://paperhub.s3.amazonaws.com/dace52a42c07f7f8348b08dc2b186061.pdf">Volcano &#x2014; An Extensible and Parallel Query Evaluation System</a>. </li>
-  </ul>
+  <h3>Le <em>Plan d'exécution physique</em>&nbsp;:</h3>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait PhysicalPlan {
 
@@ -65,10 +58,7 @@ trait PhysicalPlan {
 
 }
   </code></pre>
-</section>
-
-<section data-speaker="adrien">
-  <pre class="bigger-code scala"><code data-trim data-noescape>
+    <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Filter(
   child: PhysicalPlan, predicate: Predicate
 ) extends PhysicalPlan {
@@ -80,6 +70,9 @@ case class Filter(
 
 }
   </code></pre>
+</section>
+
+<section data-speaker="adrien">
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 case class CSVFileFullScan(
   csvFilePath: Path
@@ -94,7 +87,14 @@ case class NestedLoopJoin(
 // Etc.
   </code></pre>
 </section>
-
+<section>
+    <h3>Le <em>Volcano Model</em></h3>
+    <ul>
+        <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
+        <li>On <em>pull</em> la donnée&nbsp;;</li>
+        <li>Un opérateur&nbsp;&harr;&nbsp;Une classe&nbsp;;</li>
+    </ul>
+</section>
 <section data-speaker="adrien">
   <img src="./images/volcano-model.png" />
   <aside class="notes">

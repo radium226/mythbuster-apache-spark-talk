@@ -41,19 +41,9 @@ trait TreeNode[Type <: TreeNode[Type]] {
 }
   </code></pre>
 </section>
-
 <section>
-  <h3>Ce qu'il faut retenir&nbsp;:</h3>
-  <ul>
-    <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
-    <li>la methode <code>transform</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
-    <li>le <em>Pattern Matching</em> et les <em>Partial Functions</em> permettent d'avoir une syntaxe simple et claire lors de la définition de ces règles</li>
-  </ul>
-</section>
-
-<section>
-  <h3>Implémentation du <code>CombineFilters</code>&nbsp;:</h3>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
+    <h3>Implémentation du <code>CombineFilters</code>&nbsp;:</h3>
+    <pre class="bigger-code scala"><code data-trim data-noescape>
 object CombineFilters extends Rule[LogicalPlan] {
   def apply(plan: LogicalPlan): LogicalPlan = plan transform {
     case Filter(exp1, Filter(exp2, grandChild)) =>
@@ -62,7 +52,14 @@ object CombineFilters extends Rule[LogicalPlan] {
 }
   </code></pre>
 </section>
-
+<section>
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
+  <ul>
+    <li>le trait <code>TreeNode</code> nous aide à modéliser des structures en arbre immutables</li>
+    <li>la methode <code>transform</code> permet de transformer l'arbre à l'aide de règles <em>ad-hoc</em></li>
+    <li>le <em>Pattern Matching</em> et les <em>Partial Functions</em> permettent d'avoir une syntaxe simple et claire lors de la définition de ces règles</li>
+  </ul>
+</section>
 <section>
   <h3>Oui, mais&hellip;</h3>
   <div>
@@ -93,7 +90,7 @@ Project("name",
     <p>&hellip;Ecrire du code spécifique reste plus performant&nbsp;!</p>
   </div>
   <aside class="notes">
-Mouais... M O U A I S... TU TE FOUTERAIS PAS UN DE MA GUEULE ??
+
   </aside>
 </section>
 
