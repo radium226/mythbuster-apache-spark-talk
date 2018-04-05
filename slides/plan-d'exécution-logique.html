@@ -4,7 +4,7 @@
 
 <section>
   <h3>Deux contexts distincts&hellip;</h3>
-  <img src="./images/ast-vs-logicalplan.png" />
+  <img src="./images/query-planner.png" />
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 def plan: AST => LogicalPlan = ??? // On a quasiement
                                             // du un pour un.
@@ -72,7 +72,32 @@ case class Filter(
 
 <section>
   <h4>Exemple&nbsp;:</h4>
-  <p>Le schéma qui va bien</p>
+  <img src="./images/volcano-model-logical-plan.png" />
+</section>
+
+<section>
+  <h4>Pour ceux qui connaissent, ça reprend le concept des opérateurs de l'algèbre relationnelle&nbsp;:</h4>
+  <img src="./images/logical-plan-vs-operateur-algebrique.png" />
+</section>
+
+<section data-transition="fade-out">
+  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <img src="./images/optimisation-logique_1.png" />
+</section>
+
+<section data-transition="fade-out fade-in">
+  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <img src="./images/optimisation-logique_2.png" />
+</section>
+
+<section data-transition="fade-out fade-in">
+  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <img src="./images/optimisation-logique_3.png" />
+</section>
+
+<section data-transition="fade-in">
+  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <img src="./images/optimisation-logique_4.png" />
 </section>
 
 <section>
@@ -85,6 +110,11 @@ case class Filter(
   <pre class="bigger-code scala"><code data-trim data-noescape>
 def optimize: LogicalPlan => LogicalPlan = ???
   </code></pre>
+</section>
+
+<section>
+  <h4>Cela exploite les règles de l'algèbre relationnelle&nbsp;:</h4>
+  <img src="./images/algebrical-rules.png" />
 </section>
 
 <section>
