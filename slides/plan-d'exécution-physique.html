@@ -60,6 +60,7 @@ case class NestedLoopJoin(
 
 // Etc.
   </code></pre>
+  <p class="fragment">On est ici au niveau de <strong>l'implémentation</code>. </p>
 </section>
 
 <section>
@@ -67,7 +68,7 @@ case class NestedLoopJoin(
   <ul>
     <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
     <li>On <em>pull</em> la donnée&nbsp;;</li>
-    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe&nbsp;;</li>
+    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe.</li>
   </ul>
 </section>
 
@@ -96,7 +97,7 @@ final def execute(): <mark style="background-color: #ff79c2 ;">RDD[InternalRow]<
 </section>
 
 <section data-speaker="adrien">
-  <pre class="bigger-code sql"><code data-trim data-noescape>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
 sparkSession.sql(
   """
     |SELECT firstName, lastName
