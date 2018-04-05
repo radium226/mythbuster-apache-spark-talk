@@ -1,0 +1,197 @@
+<section data-background-class="saffron-mango" data-talker="adrien">
+  <h2>Plan d'exécution logique</h2>
+</section>
+
+<section>
+  <h3>Deux contexts distincts&hellip;</h3>
+  <img src="./images/ast-vs-logicalplan.png" />
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+def plan: AST => LogicalPlan = ??? // On a quasiement
+                                            // du un pour un.
+  </code></pre>
+  <aside class="notes">
+AST = Langage
+
+L'AST, c'est ce que l'on veut faire <br />
+
+Moteur d'execution
+Le Plan d'Execution Logique, c'est la description des étapes par lesquelles on passer pour arriver à cela.
+  </aside>
+</section>
+
+<section data-speaker="adrien">
+  <h3>De quoi parle-t-on&nbsp;?</h3>
+  <p>L'idée est de décrire <strong>les différentes étapes</strong> nécessaire à l'évaluation l'<em>AST</em>.</p>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+sealed trait LogicalPlan {
+
+  def provideColumns: Seq[ColumnName]
+
+}
+  </code></pre>
+  <aside class="notes">
+    Avec Spark, tu peux faire des jointures entre des sources de données hétérogène. <br />
+    D'un point de vue logique, tu fais des jointures entre table, mais d'un point de vue physique, tu vas faire une jointure entre CsvTable et une JdbcTable
+    On en reparlera plus tard, mais un join logique peut-être un hash Join ou un nested loop (suivant l'environnemtn dans lequel tu executes)
+    Le plan d'execution logique, il ne permet pas d'executer, c'est juste une vision algébrique de ta requête (c'est vraiment un plan)
+    Le plan physique, c'est vraiment l'execution (le marteau piqueur, celui qui rentre dans le dur)
+    Ça n'est absolument pas spécifique à Spark, c'est commun à toutes les base de données (Oracle, etc.)
+  </aside>
+</section>
+
+<section data-speaker="adrien">
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Join(
+  leftChild: LogicalPlan, rightChild: LogicalPlan,
+  expression: BinaryOperation
+) extends LogicalPlan {
+
+  override def produceColumns = {
+    leftChild.provideColumns ++ rightChild.provideColumns
+  }
+
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+case class Projection(
+  child: LogicalPlan, expression: Seq[Expression]
+) extends LogicalPlan {
+  // ...
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+case class Filter(
+  child: LogicalPlan,
+  expression: Expression
+) extends LogicalPlan {
+  // ...
+}
+  </code></pre>
+  <p class="fragment">Purement <strong>déclaratif</strong>, toujours pas d'execution !</p>
+</section>
+
+<section>
+  <h4>Exemple&nbsp;:</h4>
+  <p>Le schéma qui va bien</p>
+</section>
+
+<section>
+  <h3>Les optimisations&nbsp;:</h3>
+  <ul>
+    <li>L'objectif est de <strong>réduire le temps d'execution</strong> sans changer le résultat&nbsp;;</li>
+    <li>On utilise pour cela un certain nombre de règles algébriques&nbsp;;</li>
+    <li>Ces règles appliquées au sein d'un <em>Rule Based Optimizer</em>&nbsp;;</li>
+  </ul>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+def optimize: LogicalPlan => LogicalPlan = ???
+  </code></pre>
+</section>
+
+<section>
+  <h4>Cas du <code>PushDownFilter</code>&nbsp;:</h4>
+  <p>L'objectif est de passer l'étape <code>Filter</code> au plus tôt. </p>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+object PushDownFilter extends Rule[LogicalPlan] {
+
+  override def apply(logicalPlan: LogicalPlan): LogicalPlan = {
+    logicalPlan transformDown {
+      case Filter(
+        Join(leftChild, rightChild, joinExpression),
+        filterExpression
+      ) if leftChild.fullfillColumnsFor(filterExpression) =>
+        Join(
+          Filter(leftChild, filterExpression),
+          rightChild, joinExpression
+      )
+
+       // ...
+    }
+  }
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <h4>Exemple&nbsp;:</h4>
+  <p>Les schémas qui vont bien</p>
+</section>
+
+<section>
+  <h3>Du côté d'<em>Apache Spark</em>&nbsp;?</h3>
+  <div>
+    <div class="left-column">
+      <pre class="bigger-code scala"><code data-trim data-noescape>
+// Operator push down
+PushProjectionThroughUnion,
+ReorderJoin(conf),
+EliminateOuterJoin(conf),
+PushPredicateThroughJoin,
+PushDownPredicate,
+LimitPushDown(conf),
+ColumnPruning,
+InferFiltersFromConstraints(conf),
+// Operator combine
+CollapseRepartition,
+CollapseProject,
+CollapseWindow,
+CombineFilters,
+CombineLimits,
+CombineUnions,
+// Constant folding
+NullPropagation(conf),
+FoldablePropagation,
+OptimizeIn(conf),
+ConstantFolding,
+// ...
+      </code></pre>
+    </div>
+    <div class="right-column">
+      <ul>
+        <li>Les optimisations font parties du moteur <em>Catalyst</em>&nbsp;;</li>
+        <li>Des règles supplémentaires ajoutées à chaque nouvelle version&nbsp;;</li>
+        <li>Utilisation importante de la classe <code>TreeNode</code>. </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <pre class="bigger-code"><code data-trim data-noescape>
+sparkSession.sql(
+  """
+    |SELECT firstName, lastName
+    |  FROM employees
+    |  JOIN companies
+    |    ON companyId = id
+    | WHERE name = 'OCTO'
+  """.stripMargin).explain()
+    </code></pre>
+    <pre class="bigger-code fragment"><code data-trim data-noescape>
+== Logical Plan ==
+'Project ['firstName, 'lastName]
++- 'Filter ('name = OCTO)
+   +- 'Join Inner, ('companyId = 'id)
+      :- 'UnresolvedRelation `employees`
+      +- 'UnresolvedRelation `companies`
+  </code></pre>
+  <pre class="bigger-code fragment"><code data-trim data-noescape>
+== Optimized Logical Plan ==
+Project [firstName#39, lastName#40]
++- Join Inner, (companyId#41 = id#47)
+  :- LocalRelation [firstName#39, lastName#40, companyId#41]
+  +- Project [id#47]
+     +- Filter (isnotnull(name#48) && (name#48 = OCTO))
+        +- LocalRelation [id#47, name#48]
+  </code></pre>
+</section>
+
+<section data-speaker="marc">
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
+  <ul>
+    <li>Le plan d'exécution logique permet de définir les étapes par lequel le moteur doit passer pour exécuter une requête SQL&nbsp;;</li>
+    <li>Il peut être optimisé en s'appuyant sur des règles algébriques&nbsp;;</li>
+    <li>Il est purement déclaratif. </li>
+  </ul>
+  <p><span class="fragment">Maintenant que l'on sait ce que l'on va exécuter&hellip; </span><span class="fragment">Exécutons-le&nbsp;!</span></p>
+</section>

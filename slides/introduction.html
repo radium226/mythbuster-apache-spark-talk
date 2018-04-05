@@ -34,10 +34,10 @@ Apache Spark, c'est créé par DataBricks
 </section>
 
 <section>
-  <h3>Un petit example&nbsp;:</h3>
+  <h3>Jeu de données&nbsp;:</h3>
   <div>
-    <div>
-      <p><code>employees.csv</code></p>
+    <div style="font-size: 0.75em;">
+      <p><code>employees</code></p>
       <table>
         <thead>
           <tr>
@@ -57,11 +57,16 @@ Apache Spark, c'est créé par DataBricks
             <td>Alonso</td>
             <td>1</td>
           </tr>
+          <tr>
+            <td>Mark</td>
+            <td>Zuckerberg</td>
+            <td>2</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <div style="margin-top: 1em;">
-      <p><code>companies.csv</code></p>
+    <div style="margin-top: 1em; font-size: 0.75em;">
+      <p><code>companies</code></p>
       <table>
         <thead>
           <tr>
@@ -73,6 +78,10 @@ Apache Spark, c'est créé par DataBricks
           <tr>
             <td>OCTO</td>
             <td>1</td>
+          </tr>
+          <tr>
+            <td>Facebook</td>
+            <td>2</td>
           </tr>
         </tbody>
       </table>
@@ -137,7 +146,7 @@ val resultDF = companiesDF
 </section>
 
 <section>
-  <h3>Le SQL</h3>
+  <h4>Le SQL</h4>
   <div>
     <p>Le SQL qui permet de réaliser des requêtes homogènes sur des sources de données hétérogènes.</p>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -152,7 +161,6 @@ val resultDF = sparkSession.sql(
     |    ON companyId = id
     | WHERE name = 'OCTO'
   """.stripMargin)
-
 resultDF.show()
     </code></pre>
     <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -167,7 +175,7 @@ resultDF.show()
 </section>
 
 <section data-speaker="adrien">
-  <h3>Le projet <em>Tungsten</em></h3>
+  <h3>Le projet <em>Tungsten</em>&nbsp;:</h3>
   <ul>
     <li>Initié à partir d'<em>Apache Spark</em> 1.4&nbsp;;</li>
     <li>Ayant pour objectif une <strong>amélioration des performances</strong> sans changement de l'API&nbsp;;</li>

@@ -1,0 +1,169 @@
+<section data-speaker="adrien" data-background-class="mandy">
+  <h2>Plan d'exécution physique</h2>
+</section>
+
+<section>
+  <h3>De quoi parle-t-on&nbsp;?</h3>
+  <p>Maintenant que l'on sait par quelles étapes passer, <strong>de quelle manière</strong> est-ce que l'on les exécute&nbsp;?</p>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait PhysicalPlan {
+
+  def execute(): Iterator[Row]
+
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+def contextualize: LogicalPlan => PhysicalPlan
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class CSVFileFullScan(csvFileURL: URL) extends PhysicalPlan {
+
+  val separator = ";"
+
+  override def execute(): Iterator[Row] = ???
+
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+case class HiveTableScan(tableName: String) extends PhysicalPlan {
+
+  override def execute(): Iterator[Row] = ???
+
+}
+  </code></pre>
+</section>
+
+<section>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class Filter(
+  child: PhysicalPlan, predicate: Predicate
+) extends PhysicalPlan {
+
+  override def execute() : Iterator[Row] = {
+    child.execute()
+      .filter(predicate.evaluate)
+  }
+
+}
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+case class NestedLoopJoin(
+  leftChild: PhysicalPlan,
+  rightChild: PhysicalPlan,
+  predicate: Predicate
+) extends PhysicalPlan {
+// ...
+}
+
+// Etc.
+  </code></pre>
+</section>
+
+<section>
+  <h3>Le <em>Volcano Model</em>&nbsp;:</h3>
+  <ul>
+    <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
+    <li>On <em>pull</em> la donnée&nbsp;;</li>
+    <li>Un opérateur&nbsp;&harr;&nbsp;Une classe&nbsp;;</li>
+  </ul>
+</section>
+
+<section data-speaker="adrien">
+  <img src="./images/volcano-model.png" />
+  <aside class="notes">
+    Image du volcano model <br />
+    Classe qui s'imbriquent
+  </aside>
+</section>
+
+<section data-speaker="adrien">
+  <h3>Du côté d'<em>Apache Spark</em>&hellip;</h3>
+  <p>C'est exactement la même chose, sauf que&hellip;</p>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+final def execute(): <mark style="background-color: #ff79c2 ;">RDD[InternalRow]</mark> = executeQuery {
+  if (isCanonicalizedPlan) {
+    throw new IllegalStateException(
+      "A canonicalized plan is not supposed to be executed."
+    )
+  }
+  doExecute()
+}
+  </code></pre>
+  <p class="fragment">&hellip;On retrouve l'abstraction <code>RDD[_]</code>&nbsp;!</p>
+</section>
+
+<section data-speaker="adrien">
+  <pre class="bigger-code sql"><code data-trim data-noescape>
+sparkSession.sql(
+  """
+    |SELECT firstName, lastName
+    |  FROM employees
+    |  JOIN companies
+    |    ON companyId = id
+    | WHERE name = 'OCTO'
+  """.stripMargin).explain()
+  </code></pre>
+  <pre class="bigger-code fragment"><code data-trim data-noescape>
+== Physical Plan ==
+*Filter (isnotnull(firstName#5) && (firstName#5 = Adrien))
++- *SerializeFromObject (...)
+   +- Scan ExternalRDDScan[obj#3]
+  </code></pre>
+</section>
+
+<section data-speaker="marc">
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
+  <ul>
+    <li>Le plan d'exécution physique correspond à l'implémentation des étapes à réaliser pour exécuter la requête SQL&nbsp;;</li>
+    <li>Il peut être optimisé en fonction de l'environnement d'exécution de la requête (<code>CSVFileScan</code>, <code>HiveTableScan</code>, etc.)&nbsp;;</li>
+    <li>Il repose sur le principe du <em>Volcano Model</em>. </li>
+  </ul>
+</section>
+
+<section>
+  <h3>Oui, mais&hellip;</h3>
+  <div>
+    <div class="left-column">
+      <pre class="bigger-code java"><code data-trim data-noescape>
+while(rows.hasNext()) {
+  Row currentRow = rows.next();
+  if(currentRow
+      .get("age") > 18)
+    return currentRow
+      .get("name");
+}
+      </code></pre>
+    </div>
+    <div class="right-column">
+      <pre class="bigger-code scala"><code data-trim data-noescape>
+Project("name",
+  Filter(
+    Expression("age",
+      greaterThan(18)),
+    CsvScan("people.csv")
+  )
+)
+      </code></pre>
+    </div>
+  </div>
+  <div style="clear: both;">
+    <p>&hellip;Ecrire du code spécifique reste plus performant&nbsp;!</p>
+  </div>
+  <aside class="notes">
+
+  </aside>
+</section>
+
+<section>
+  <h3>Une sombre histoire de <em>JIT</em>&nbsp;:</h3>
+  <ul>
+    <li>Un opérateur 	&rArr; une implémentation du <em>Trait</em> <code>PhysicalPlan</code>&nbsp;;</li>
+    <li>Invoquer la méthode <code>execute(...)</code> 	&rArr; Appel à une fonction virtuelle&nbsp;;</li>
+    <li>Trop d'implémentation &rArr; On est dans le cas <em>Megamorphic</em>&nbsp;;</li>
+    <li class="fragment">On casse le <em>Pipelining</em>. </li>
+  </ul>
+  <p class="fragment">Pour plus de détails&nbsp;: <a href="http://insightfullogic.com/2014/May/12/fast-and-megamorphic-what-influences-method-invoca/">Too Fast, Too Megamorphic: what influences method call performance in Java?</a>. </p>
+</section>

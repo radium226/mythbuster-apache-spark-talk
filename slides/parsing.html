@@ -3,8 +3,7 @@
 </section>
 
 <section data-speaker="marc">
-  <h2><em>Parsing</em> d'une reqête SQL</h2>
-  <p>Deux étapes&nbsp;:</p>
+  <h3>Deux étapes&nbsp;:</h3>
   <img src="./images/lexing_parsing.png" />
   <aside class="notes">
     Résumé de tout sous forme de schéma
@@ -12,7 +11,7 @@
 </section>
 
 <section data-speaker="marc">
-  <h3>L'analyse lexicale</h3>
+  <h4>L'analyse lexicale</h4>
   <img src="./images/lexing.png" />
   <aside class="notes">
     Schéma avec un exemple de requête SQL
@@ -30,12 +29,12 @@ case class From() extends Token
 // ...
   </code></pre>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-def lexer: String => Seq[Token] = ???
+def lexer: SQL => Seq[Token] = ???
   </code></pre>
 </section>
 
 <section data-speaker="marc">
-  <h3>L'analyse syntaxique</h3>
+  <h4>L'analyse syntaxique</h4>
   <img src="./images/parsing.png" />
   <aside class="notes">
     Pareil, un schéma depuis les token vers l'AST
@@ -48,17 +47,20 @@ trait AST
 
 case class Table(name: String) extends AST
 
-case class Alias(table: Table, name: String) extends AST
-
 case class Select(
   projections: Seq[Expression],
   filter: Option[Expression],
   relations: Seq[Table]
 ) extends AST
+  </code></pre>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
+trait Expression extends AST {
 
-// ...
+  def evaluate(row: Row): AnyRef
 
-trait Expression extends AST
+  def needColumns: Seq[ColumnName]
+
+}
 
 // ...
   </code></pre>
@@ -73,7 +75,7 @@ def parser: Seq[Token] => AST
 </section>
 
 <section data-speaker="marc">
-  <h3>Implémentations</h3>
+  <h3>Implémentations&nbsp;:</h3>
   <div>
     <div class="left-column">
       <img src="./images/scala-logo.png" />

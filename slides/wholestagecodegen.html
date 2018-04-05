@@ -59,16 +59,6 @@ Montrer le trait <code>SupportCodeGenreation</code> et <code>doGenretaeCode</cod
   </aside>
 </section>
 
-<!--<section data-speaker="marc">
-  <pre class="bigger-code scala"><code data-trim data-noescape>
-TODO
-  </code></pre>
-  <aside class="notes">
-Example de code généré <br />
-Chacun des opérateurs génère un morceau de code <br />
-  </aside>
-</section>-->
-
 <section data-speaker="marc">
   <h3>Et du côté de chez Spark&nbsp;?</h3>
   <img src="./images/spark-ui.png" />
@@ -76,9 +66,14 @@ Chacun des opérateurs génère un morceau de code <br />
 
 <section data-speaker="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
-spark
-  .sql("SELECT * FROM persons WHERE firstName = 'Adrien'")
-  .queryExecution.codegen()
+sparkSession.sql(
+  """
+    |SELECT firstName, lastName
+    |  FROM employees
+    |  JOIN companies
+    |    ON companyId = id
+    | WHERE name = 'OCTO'
+  """.stripMargin).queryExecution.codegen()
   </code></pre>
   <pre class="bigger-code java fragment"><code data-trim data-noescape>
 /* 005 */ final class GeneratedIterator
@@ -94,11 +89,6 @@ spark
                   (InternalRow) inputadapter_input.next();
 /* 043 */       boolean inputadapter_isNull =
                   inputadapter_row.isNullAt(0);
-/* 044 */       octo.example.Person inputadapter_value =
-                  inputadapter_isNull ?
-                    null :
-                    ((octo.example.Person)inputadapter_row
-                      .get(0, null));
 // ...
   </code></pre>
   <aside class="notes">
@@ -129,4 +119,31 @@ spark
     C'est bien : JIT, pipelining, etc.
 Par contre : ça fait chier abec les UDF, ça ne marche qu'avec des oéprateurs à une seulle branche, voilà.
   </aside>
+</section>
+
+<section data-speaker="marc">
+  <h3>Ce qu'il faut retenir&nbsp;:</h3>
+  <ul>
+    <li>La génération de code permet de concerver le <em>Pipelining</em> de la donnée&nbsp;;</li>
+    <li>On génère à la volée une étape du plan d'exécution physique designée exprès pour la requête en entrée&nbsp;;</li>
+    <li>Cette nouvelle étape est totalement transparente pour le développeur (car géré totalement par <em>Catalyst</em>). </li>
+  </ul>
+</section>
+
+
+<section data-speaker="marc">
+  <h3>Assemblons&nbsp;:</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+def execute: String => Iterator[Row] = { sql =>
+  (
+    lexer                  andThen
+    parser                 andThen
+    plan                   andThen
+    optimize[LogicalPlan]  andThen
+    contextualize          andThen
+    optimize[PhysicalPlan] // Including code
+                           // generation
+  ).execute(sql)
+}
+  </code></pre>
 </section>

@@ -9,7 +9,7 @@
     <li>Partir d'un <code>String</code> pour récupérer une <code>Class[_]</code>&nbsp;;</li>
   </ul>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-def compile(code: String): Class[_] = ???
+def compile: String => Class[_] = ???
   </code></pre>
   <p class="fragment">Essayons !</p>
 </section>
@@ -63,7 +63,7 @@ myTalker.talk()
 
 <section data-speaker="adrien">
   <h3>Ouch! </h3>
-  <p>Le type de <code>myTalker</code> n'est pas défini à la compilation !</p>
+  <p>Le type de <code>GeneratedTalker</code> de la variable <code>myTalker</code> n'est pas défini à la compilation !</p>
   <p>Il nous faut un <strong>pont</strong> entre le <em>Compile Time</em> et le <em>Run Time</em>&hellip; </p>
   <pre class="bigger-code java fragment"><code data-trim data-noescape>
 public interface Talker {
