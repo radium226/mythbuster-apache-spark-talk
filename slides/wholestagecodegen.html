@@ -3,12 +3,6 @@
 </section>
 
 <section data-speaker="marc">
-  <p><em>Apache Spark</em> introduit le&nbsp:</p>
-  <h2><code>WholeStageCodegen</code></h2>
-  <p>Une classe &harr; <em>n</em> opérateurs</p>
-</section>
-
-<section data-speaker="marc">
   <img style="width:50%; height: 50%;" src="./images/wholestagecodegen.png" />
   <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
 </section>
@@ -16,6 +10,13 @@
 <section data-speaker="marc">
   <p>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</p>
   <h3 class="fragment">La génération de code&nbsp;!</h3>
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+case class JavaCodeGeneration(child: PhysicalPlan) extends PhysicalPlan {
+  // ...
+}
+
+def generateCode: PhysicalPlan => PhysicalPlan
+  </code></pre>
   <aside class="notes">
     La génération de code nous permet d'avoir les performances d'un langage impératif avec la fléxibilité d'un langage orienté objet : mindblow !!
   </aside>
@@ -38,11 +39,11 @@ trait JavaCodeGenerationSupport {
   </code></pre>
 
   <pre class="bigger-code scala"><code data-trim data-noescape>
-case class Filter(child: PhysicalPlan, expression: e.Expression)
+case class Filter(child: PhysicalPlan, expression: Expression)
   extends PhysicalPlan with JavaCodeGenerationSupport {
 
   override def doConsumeJavaCode(
-    codeGenerationContext: c.JavaCodeGenerationContext,
+    codeGenerationContext: JavaCodeGenerationContext,
     rowVariableName: JavaCode
   ): JavaCode = {
     s"""
@@ -55,7 +56,7 @@ case class Filter(child: PhysicalPlan, expression: e.Expression)
 // ...
   </code></pre>
   <aside class="notes">
-Montrer le trait <code>SupportCodeGenreation</code> et <code>doGenretaeCode</code>
+Montrer le trait <code>SupportCodeGenreation</code> et <code>doGenerate</code>
   </aside>
 </section>
 
@@ -93,6 +94,16 @@ sparkSession.sql(
   </code></pre>
   <aside class="notes">
     Example d'un debug de Spark pour avoir le plan d'execution (avec debug à true et tutti quanti)
+  </aside>
+</section>
+
+<section data-speaker="adrien">
+  <h3><em>Janino</em>&hellip; </h3>
+  <img src="./images/janino.png" />
+  <p class="fragment">Comme avec <code>javac</code>... Mais en mémoire !</p>
+  <aside class="notes">
+Apache Spark ne génère pas du code avec java comme nous nous l'avons fait au début, mais avec une librairie qui s'appelle Janino <br />
+La seule différence est que tout est fait en mémoire, mais le principe est exactement le même.
   </aside>
 </section>
 
@@ -136,13 +147,12 @@ Par contre : ça fait chier abec les UDF, ça ne marche qu'avec des oéprateurs 
   <pre class="bigger-code scala"><code data-trim data-noescape>
 def execute: String => Iterator[Row] = { sql =>
   (
-    lexer                  andThen
-    parser                 andThen
-    plan                   andThen
-    optimize[LogicalPlan]  andThen
-    contextualize          andThen
-    optimize[PhysicalPlan] // Including code
-                           // generation
+    tokenize      andThen
+    parse         andThen
+    plan          andThen
+    optimize      andThen
+    contextualize andThen
+    generateCode
   ).execute(sql)
 }
   </code></pre>

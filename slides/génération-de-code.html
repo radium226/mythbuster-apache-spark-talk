@@ -1,5 +1,8 @@
 <section data-background-class="mantis" data-speaker="adrien">
   <h2>Génération de code et exécution</h2>
+  <aside class="notes">
+Lorsque l'on a voulu comprendre cette notion de génération de code, la première chose que l'on a fait pour tester, c'est générer du code
+  </aside>
 </section>
 
 <section data-speaker="adrien">
@@ -16,6 +19,12 @@ def compile: String => Class[_] = ???
 
 <section data-speaker="adrien">
   <img src="./images/compileJava.png" style="background:none; border:none; box-shadow:none;"/>
+  <aside class="notes">
+Voilà notre plan d'action <br />
+On va écrire le code source dans un fichier temporaire <br />
+Appeler programmatiquement javac <br />
+Chager la class avec le classloader qui va bien depuis le fichier .class généré
+  </aside>
 </section>
 
 <section data-speaker="adrien">
@@ -44,8 +53,8 @@ Seq(
 val classLoader = new URLClassLoader("/tmp/generated-classes")
   </code></pre>
   <aside class="notes">
-Bien expliquer qu'il n'y a rien de compliqué : il s'agit juste d'appeler un
-process externe exactement comme si l'on lançait la commande depuis le Terminal
+Alors petite remarque : on est en Scala et on génère du Java. C'est juste parce que c'est plus simple, et c'est comme ça que fonctionne Spark <br />
+Il n'y a rien de compliqué, on ne fait qu'appeler un process externe, exactement comme si l'on lançait la commande depuis le Terminal
   </aside>
 </section>
 
@@ -71,7 +80,8 @@ public interface Talker {
 }
   </code></pre>
   <aside class="notes">
-    Pourquoi Java ? On a voulu faire comme Spark : c'est plus rapide à compiler, et en plus avec Janino, c'est stylé parce que c'est tout en mémoire.
+Si l'on lance dans IntelliJ, on verrait direct le problème : talk() n'est juste pas défini à la compilation
+Il nous faut un pont entre la compilation et l'execution
   </aside>
 </section>
 
@@ -99,20 +109,17 @@ val myTalker: Talker = classLoader
 println(myTalker.talk())
 // "Hello World !"
   </code></pre>
-</section>
-
-<section data-speaker="adrien">
-  <h3>Du côté d'<em>Apache Spark</em>&nbsp;? </h3>
-  <img src="./images/janino.png" />
-  <p class="fragment">On fait la même chose... Mais en mémoire !</p>
   <aside class="notes">
-    Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ?
+Rebolote : on fait la même mais en castant l'objet généré ici avec notre type défini à la compilation. <br />
+Et ça marche
   </aside>
+</section>
 </section>
 
 <section data-speaker="adrien">
   <img src="./images/so-what-2.png" />
   <aside class="notes">
-    Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ?
+Bon bah c'est super, on sait générer du code... Et maintenant, on fait quoi ? <br />
+En quoi cela nous aide à exécuter une requête SQL ? <br />
   </aside>
 </section>

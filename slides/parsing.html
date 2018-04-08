@@ -6,7 +6,8 @@
   <h3>Deux étapes&nbsp;:</h3>
   <img src="./images/lexing_parsing.png" />
   <aside class="notes">
-    Résumé de tout sous forme de schéma
+Le parsing d'une requête se fait en deux étapes que nous allons voir <br />
+Le lexing et le parsing en tant que tel
   </aside>
 </section>
 
@@ -14,7 +15,8 @@
   <h4>L'analyse lexicale</h4>
   <img src="./images/lexing_2.png" />
   <aside class="notes">
-    Schéma avec un exemple de requête SQL
+Le lexing (aussi appeler tokeninzation ou analyse lexical) correspond juste à l'extraction depuis notre String de tokens <br />
+Les tokens sont, en gros : soit des mots clés (SELECT, etc.) soit des literaux (les parties dynamique de la requête, comme les noms de tables, etc.)
   </aside>
 </section>
 
@@ -29,15 +31,22 @@ case class From() extends Token
 // ...
   </code></pre>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-def lexer: SQL => Seq[Token] = ???
+def tokenize: String => Seq[Token] = ???
   </code></pre>
+  <aside class="notes">
+Au niveau du code, il suffit en fait de définir chacun des tokens qui défini le langage comme case class. <br />
+On verra un peu plus loin pour l'implémentation de cette fonction tokenize
+  </aside>
 </section>
 
 <section data-speaker="marc">
   <h4>L'analyse syntaxique</h4>
   <img src="./images/parsing_2.png" />
   <aside class="notes">
-    Pareil, un schéma depuis les token vers l'AST
+La ou le lexing va juste vérifier que tous les mots font bien parti du langage, le parsing va par contre verifier que les mots sont dans le bon sens <br />
+Ces mots sont hierarchiés par le parseur pour former un AST <br />
+L'AST est donc une structure en arbre qui va être exploitable par le code de manière plus simple qu'avec une String ou un Seq[Token] <br />
+N'importe quel language utilise ça (y a un AST pour Java, pour Scala, etc.) y a rien de révolutionnaire et ça n'est pas du tout propre à Spark
   </aside>
 </section>
 
@@ -66,11 +75,12 @@ trait Expression extends AST {
   </code></pre>
 
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-def parser: Seq[Token] => AST
+def parse: Seq[Token] => AST
   </code></pre>
   <aside class="notes">
-    Le parser permet de donner un sens aux tokens : de hiérarchiser les tokens, et contextualiser tout ça. <br />
-    N'importe quel language utilise ça (y a un AST pour Java, pour Scala, etc.) y a rien de révolutionnaire et ça n'est pas du tout propre à Spark
+Au niveau du code, idem, c'est pas très compliqué <br />
+On va avoir un trait par noeud de l'AST, et on voit que le SELECT est une phrase de notre langage, et c'est lui qui nous sert de racine <br />
+On distingue aussi une sous catégorie qui sont les expressions (en gros, ce que l'on va retrouver dans les filtres, etc.)
   </aside>
 </section>
 
@@ -110,8 +120,8 @@ statement
     </div>
   </div>
   <aside class="notes">
-    Logos de Parser Combinator et ANTLR <br />
-    Pour nous, les Parser Combinator s'était suffisant, mais ANTLR c'est plus sérieux pour des langages beaucoup plus complexes (type SQL ANSI, etc.)
+Pour nous, les Parser Combinator s'était suffisant <br />
+Mais ANTLR c'est plus sérieux pour des langages beaucoup plus complexes (type SQL ANSI, etc.)
   </aside>
 </section>
 

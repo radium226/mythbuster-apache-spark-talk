@@ -1,5 +1,9 @@
 <section data-background-class="saffron-mango" data-talker="adrien">
   <h2>Plan d'exécution logique</h2>
+  <aside class="notes">
+On va voir qu'en fait, l'execution se fait en deux étapes <br />
+La première, c'est de transformer notre AST dans un Plan d'execution logique
+  </aside>
 </section>
 
 <section>
@@ -7,22 +11,19 @@
   <img src="./images/query-planner.png" />
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 def plan: AST => LogicalPlan = ??? // On a quasiement
-                                            // du un pour un.
+                                   // du un pour un.
   </code></pre>
   <aside class="notes">
-AST = Langage
-
-L'AST, c'est ce que l'on veut faire <br />
-
-Moteur d'execution
-Le Plan d'Execution Logique, c'est la description des étapes par lesquelles on passer pour arriver à cela.
+On va passer sous silence l'implémentation de la fonction plan qui permet de passer d'un AST à un plan logique, parce qu'en fait c'est quasiement du 1 pour 1 <br />
+L'idée, c'est juste de changer de contexte / d'environnement <br />
+L'AST correspond au langage tandis que le plan d'exection logique va être dans l'execution
   </aside>
 </section>
 
 <section data-speaker="adrien">
   <h3>De quoi parle-t-on&nbsp;?</h3>
   <p>L'idée est de décrire <strong>les différentes étapes</strong> nécessaire à l'évaluation l'<em>AST</em>.</p>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 sealed trait LogicalPlan {
 
   def provideColumns: Seq[ColumnName]
@@ -30,12 +31,11 @@ sealed trait LogicalPlan {
 }
   </code></pre>
   <aside class="notes">
-    Avec Spark, tu peux faire des jointures entre des sources de données hétérogène. <br />
-    D'un point de vue logique, tu fais des jointures entre table, mais d'un point de vue physique, tu vas faire une jointure entre CsvTable et une JdbcTable
-    On en reparlera plus tard, mais un join logique peut-être un hash Join ou un nested loop (suivant l'environnemtn dans lequel tu executes)
-    Le plan d'execution logique, il ne permet pas d'executer, c'est juste une vision algébrique de ta requête (c'est vraiment un plan)
-    Le plan physique, c'est vraiment l'execution (le marteau piqueur, celui qui rentre dans le dur)
-    Ça n'est absolument pas spécifique à Spark, c'est commun à toutes les base de données (Oracle, etc.)
+Le plan d'execution logique va juste correspondre aux différentes étapes par lesquelles il faut passer pour executer la requête <br />
+On parle ici de description, la requête n'est pas executée à ce niveau là. <br />
+Le plan d'execution logique, c'est juste une vision algébrique de ta requête (c'est vraiment un plan) <br />
+La seule différence avec l'AST pour le moment, c'est que l'on va devoir définir des implémentation du trait LogicalPlan qui soit capable de nous fournir les noms de colonnes qu'il fournisse <br />
+C'est interessant de noter que Spark (et dans les bases de données en général), le fait de fournir les colonnes fournies pour une table source... Correspond à la définition du schéma! 
   </aside>
 </section>
 
@@ -68,6 +68,11 @@ case class Filter(
 }
   </code></pre>
   <p class="fragment">Purement <strong>déclaratif</strong>, toujours pas d'execution !</p>
+  <aside class="notes">
+Vous avez tous entendu parlé de HashJoin ou de NestedLoopJoin... Bah c'est pas ici. Encore une fois, ici, ce n'est que délcaratif <br />
+Spark permet de faire des requêtes SQL sur des sources de données hétérogènes... Mais ici, on aura des Scan, mais de JdbcScan ou de HiveScan... <br />
+On a ici le "ce que l'on veut faire", mais pas le "comment on va le faire"
+  </aside>
 </section>
 
 <section>
@@ -76,27 +81,28 @@ case class Filter(
 </section>
 
 <section>
-  <h4>Pour ceux qui connaissent, ça reprend le concept des opérateurs de l'algèbre relationnelle&nbsp;:</h4>
+  <h4>Un peu d'algèbre&nbsp;:</h4>
+  <p>Cela reprend le concept des opérateurs de l'algèbre relationnelle.</p>
   <img src="./images/logical-plan-vs-operateur-algebrique.png" />
 </section>
 
 <section data-transition="fade-out">
-  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_1.png" />
 </section>
 
 <section data-transition="fade-out fade-in">
-  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_2.png" />
 </section>
 
 <section data-transition="fade-out fade-in">
-  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_3.png" />
 </section>
 
 <section data-transition="fade-in">
-  <h4>Chaque opérateur représente 1 action&nbsp;:</h4>
+  <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_4.png" />
 </section>
 
@@ -107,14 +113,29 @@ case class Filter(
     <li>On utilise pour cela un certain nombre de règles algébriques&nbsp;;</li>
     <li>Ces règles appliquées au sein d'un <em>Rule Based Optimizer</em>&nbsp;;</li>
   </ul>
-  <pre class="bigger-code scala"><code data-trim data-noescape>
+  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 def optimize: LogicalPlan => LogicalPlan = ???
   </code></pre>
+  <aside class="notes">
+Avant de passer au plan d'execution physique (qui va réellement nous permette d'executer la requête), il y a une étape d'optimisation <br />
+L'idée, c'est juste d'appliquer des règles qui vont nous permettre in fine d'executer la requête <br />
+Ce sont des règles purement logique (qui ne s'appuie pas sur la données en tant que tel, comme la volumétrie des tables en jeu, par exemple)
+  </aside>
 </section>
 
 <section>
-  <h4>Cela exploite les règles de l'algèbre relationnelle&nbsp;:</h4>
+  <h4>Encore un peu d'algèbre&nbsp;:</h4>
+  <p>Les lois algébriques prouvent que le resultat de la requête ne sera pas changé après optimisation. </p>
   <img src="./images/algebrical-rules.png" />
+  <aside class="notes">
+Vu que le plan d'execution logique s'appuie sur une description algébrique des transformations à réaliser pour executer une requête <br />
+Il est possible d'appliquer des lois algébriques qui vont nous aider à optimiser la requête
+  </aside>
+</section>
+
+<section>
+  <h4>Exemple&nbsp;:</h4>
+  <p>Les schémas qui vont bien</p>
 </section>
 
 <section>
@@ -140,11 +161,6 @@ object PushDownFilter extends Rule[LogicalPlan] {
 
 }
   </code></pre>
-</section>
-
-<section>
-  <h4>Exemple&nbsp;:</h4>
-  <p>Les schémas qui vont bien</p>
 </section>
 
 <section>
@@ -180,7 +196,7 @@ ConstantFolding,
       <ul>
         <li>Les optimisations font parties du moteur <em>Catalyst</em>&nbsp;;</li>
         <li>Des règles supplémentaires ajoutées à chaque nouvelle version&nbsp;;</li>
-        <li>Utilisation importante de la classe <code>TreeNode</code> qui permet d'avoir la méthode <code>transformDown</code>. </li>
+        <li>Utilisation du trait <code>TreeNode</code> qui permet d'avoir la méthode <code>transformDown</code>. </li>
       </ul>
     </div>
   </div>

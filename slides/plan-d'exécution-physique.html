@@ -1,5 +1,9 @@
 <section data-speaker="adrien" data-background-class="mandy">
   <h2>Plan d'exécution physique</h2>
+  <aside class="notes">
+Jusqu'ici, tout ce que l'on a vu était applicable à toutes les bases de données <br />
+Mais c'est par ici que ça commence un peu à diverger.
+  </aside>
 </section>
 
 <section>
@@ -15,6 +19,12 @@ trait PhysicalPlan {
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 def contextualize: LogicalPlan => PhysicalPlan
   </code></pre>
+  <aside class="notes">
+L'idée va donc maintenant de décire la manière dont chacune des étapes définies précedement vont être executées. <br />
+Il suffit pour cela d'implémenter des classes qui étendent le trait PhysicalPlan et qui implémente la méthode execute <br />
+L'implémentation de contextalize est triviale, car encore une fois, c'est presque du un pour un <br />
+Le vrai challenge maintenant va plutôt être d'implémenter les méthodes execute
+  </aside>
 </section>
 
 <section>
@@ -34,12 +44,18 @@ case class HiveTableScan(tableName: String) extends PhysicalPlan {
 
 }
   </code></pre>
+  <aside class="notes">
+On en parlait tout à l'heure, mais là ou un TableScan est générique (et indépendant de la source de la données), <br />
+On a ici des implémentations concrêtes qui vont être définis dans la méthode contextualize <br />
+Et qui vont justement dépendre du contexte d'execution <br />
+Passons les implémentations, parce que là, on va juste utiliser les drivers fournis par Hive, ou bien juste parser un fichier CSV
+  </aside>
 </section>
 
 <section>
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Filter(
-  child: PhysicalPlan, predicate: Predicate
+  child: PhysicalPlan, predicate: Expression
 ) extends PhysicalPlan {
 
   override def execute() : Iterator[Row] = {
@@ -60,7 +76,13 @@ case class NestedLoopJoin(
 
 // Etc.
   </code></pre>
-  <p class="fragment">On est ici au niveau de <strong>l'implémentation</code>. </p>
+  <p class="fragment">On est ici au niveau de <strong>l'implémentation</strong>. </p>
+  <aside class="notes">
+L'implementation du filter est plus interessante : on va ici seulement s'appuyer sur le fait qu'un Iterator possède lui-même une méthode filter <br />
+Méthode que l'on va appliquer à l'aide du prédicat qui a été défini défini en amont lorsque l'on a parsé la requête SQL (car Expression est du type AST) <br />
+On peut assi voir le NestedLoopJoin qui va être une implémentation de la jointure en se basant sur deux boucles imbriquées <br />
+A l'inverse du HashJoin qui va lui se baser sur des indexs.
+  </aside>
 </section>
 
 <section>
@@ -70,13 +92,17 @@ case class NestedLoopJoin(
     <li>On <em>pull</em> la donnée&nbsp;;</li>
     <li>Un opérateur&nbsp;&harr;&nbsp;Une classe.</li>
   </ul>
+  <aside class="notes">
+Le fait de passer par des Iterator est typique de ce que l'on appelle le Volcano Model <br />
+C'est le modèle utilisé dans la plupart des bases de données <br />
+On a ici une correspondance entre un opérateur algébrique défini avant qui va correspondre à une classe qui va fournir les méthodes hasNext et next de l'Iterator (ce que l'on fait nous en utilisant directement un Iterator)
+  </aside>
 </section>
 
 <section data-speaker="adrien">
   <img src="./images/volcano-model.png" />
   <aside class="notes">
-    Image du volcano model <br />
-    Classe qui s'imbriquent
+Classe qui s'imbriquent
   </aside>
 </section>
 
@@ -167,4 +193,10 @@ Project("name",
     <li class="fragment">On casse le <em>Pipelining</em>. </li>
   </ul>
   <p class="fragment">Pour plus de détails&nbsp;: <a href="http://insightfullogic.com/2014/May/12/fast-and-megamorphic-what-influences-method-invoca/">Too Fast, Too Megamorphic: what influences method call performance in Java?</a>. </p>
+</section>
+
+<section data-speaker="marc">
+  <p><em>Apache Spark</em> introduit le&nbsp:</p>
+  <h2><code>WholeStageCodegen</code></h2>
+  <p>Une classe &harr; <em>n</em> opérateurs</p>
 </section>

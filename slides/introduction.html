@@ -1,22 +1,19 @@
 <section data-background-class="mandy">
   <h2>Aperçu d'<em>Apache Spark</em></h2>
   <aside class="notes">
-Avant de rentrer dans le coeur du sujet, remettons-nous tous à niveau
+Pas de panique, nous allons d'abord faire quelques rappels sur ce qu'est Apache Spark <br />
+Qui dans la salle connait Apache Spark et l'utilise en production ?
   </aside>
 </section>
 
 <section data-speaker="adrien">
   <img src="./images/apache-spark-logo.svg" />
   <aside class="notes">
-Disclaimer : Apache Spark, c'est pas grave et on va y aller doucement.
-Pour ceux qui ne connaissent pas, Spark c'est un framework de calcul distribué : c'est écrit en Scala,
-on désinge des sources de données en entrée, un stockage en sortie,
-  et on définit des transformations entre les deux.
-Il existe plusieurs niveaux d'abstraction pour décrire les transformations :
-      - RDD : impératif
-      - Dataframe/SQL : déclaratif
-La donnée est récupéré
-Apache Spark, c'est créé par DataBricks
+Pour les autres, c'est pas grave, on va y aller doucement. <br />
+Apache Spark est un framework de calcul distribué écrit en Scala <br />
+C'est la société Databricks qui gère le développement de l'outil <br />
+L'idée, c'est de définir des sources de données en entrée et un stockage en sortie et l'on défini des transformations entre les deux<br />
+On peut voir ça comme une espèce d'ETL distribué <br />
   </aside>
 </section>
 
@@ -29,7 +26,8 @@ Apache Spark, c'est créé par DataBricks
     <li>Se base sur des <strong>abstractions</strong> de niveaux différents. </li>
   </ul>
   <aside class="notes">
-    Schéma d'un ETL distribué
+Spark est résilient : si l'un des noeuds du cluster tombe, on peut s'en sortir (même si certains calculs intermédiaires vont être fait à nouveau) <br />
+Les abstractions ne sont pas des évolutions mais bel et bien des niveaux d'abstractions différents <br />
   </aside>
 </section>
 
@@ -87,6 +85,10 @@ Apache Spark, c'est créé par DataBricks
       </table>
     </div>
   </div>
+  <aside class="notes">
+Petit point sur ce jeu de données : tout ce que l'on va vous expliquer dans les slides suivants, on va essayer de l'illustrer en se basant sur ce jeu de données <br />
+Ne le perdez pas de vue !
+  </aside>
 </section>
 
 <section>
@@ -116,6 +118,12 @@ octoEmployees.collect()
 // (Adrien,Besnard)
     </code></pre>
   </div>
+  <aside class="notes">
+Le RDD, c'est un peu l'assembleur de Spark. C'est litérallement un iterateur distribué <br />
+Pour ceux qui connaissent un peu les streams en Java ou juste le framework collection de Scala, Spark fourni les mêmes méthodes pour transformer de la données. <br />
+Un petit point qui n'est pas très important pour la suite, mais qu'il faut retenir, c'est que Spark défini les transformations de manière lazy <br />
+C'est à dire que ces transformations ne sont réalisées qu'une fois qu'une action déclenche le traitement (ici, c'est le foreach)
+  </aside>
 </section>
 
 <section>
@@ -143,6 +151,11 @@ val resultDF = companiesDF
 // +---------+--------+
     </code></pre>
   </div>
+  <aside class="notes">
+Les Dataframes sont une abstraction de plus haut niveau, mais sous le capot, elles s'appuient aussi sur les RDD <br />
+On a vu que le code précédement était un peu compliqué, mais on a ici un DSL qui permet de manipuler des données structurées (en gros, des tables avec un schéma qui ont des colonnes) <br />
+On dirait presque du SQL...
+  </aside>
 </section>
 
 <section>
@@ -172,6 +185,11 @@ resultDF.show()
 // +---------+--------+
     </code></pre>
   </div>
+  <aside class="notes">
+Le SQL est une autre abstraction qui est du même niveau que les Dataframes (sous le capot, une requête SQL et une DataFrame sont équivalente) <br />
+Cette abstraction va nous permettre de faire des requêtes SQL homogènes (de par le langage standard) sur des sources de données hétérogènes <br />
+Pour l'exemple, on a ici des données qui viennent d'une séquence statique, mais elles pourraient venir d'une table Hive d'un côté et d'un fichier CSV de l'autre
+  </aside>
 </section>
 
 <section data-speaker="adrien">
@@ -183,16 +201,13 @@ resultDF.show()
     <li>Depuis <em>Apache Spark</em> 2.0, <strong>génération de code</strong> à la volée. </li>
   </ul>
   <aside class="notes">
-    Schéma avec SELECT<br />
-    Suite aux bench de Databricks : CPU is the bottelneck
+Suite aux bench de Databricks : CPU is the bottelneck
   </aside>
 </section>
 
 <section data-speaker="adrien">
   <img src="./images/wait-a-minute.jpg" />
   <aside class="notes">
-    Image WTF ? <br />
-    Pour bien comprendre, on farfouille dans Spark <br />
-    Qu'est ce que ça veut dire génération de code à la volée ?
+Qu'est ce que ça veut dire génération de code à la volée ?
   </aside>
 </section>
