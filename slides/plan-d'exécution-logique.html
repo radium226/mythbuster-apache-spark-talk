@@ -35,7 +35,7 @@ Le plan d'execution logique va juste correspondre aux différentes étapes par l
 On parle ici de description, la requête n'est pas executée à ce niveau là. <br />
 Le plan d'execution logique, c'est juste une vision algébrique de ta requête (c'est vraiment un plan) <br />
 La seule différence avec l'AST pour le moment, c'est que l'on va devoir définir des implémentation du trait LogicalPlan qui soit capable de nous fournir les noms de colonnes qu'il fournisse <br />
-C'est interessant de noter que Spark (et dans les bases de données en général), le fait de fournir les colonnes fournies pour une table source... Correspond à la définition du schéma! 
+C'est interessant de noter que Spark (et dans les bases de données en général), le fait de fournir les colonnes fournies pour une table source... Correspond à la définition du schéma!
   </aside>
 </section>
 
@@ -43,7 +43,7 @@ C'est interessant de noter que Spark (et dans les bases de données en général
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Join(
   leftChild: LogicalPlan, rightChild: LogicalPlan,
-  expression: BinaryOperation
+  predicate: Expression
 ) extends LogicalPlan {
 
   override def produceColumns = {
