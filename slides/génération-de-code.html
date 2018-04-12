@@ -18,16 +18,6 @@ def compile: String => Class[_] = ???
 </section>
 
 <section data-speaker="adrien">
-  <img src="./images/compileJava.png" style="background:none; border:none; box-shadow:none;"/>
-  <aside class="notes">
-Voilà notre plan d'action <br />
-On va écrire le code source dans un fichier temporaire <br />
-Appeler programmatiquement javac <br />
-Chager la class avec le classloader qui va bien depuis le fichier .class généré
-  </aside>
-</section>
-
-<section data-speaker="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 val javaClassCode : String =
     """public class GeneratedTalker {
@@ -65,15 +55,27 @@ val myTalker = classLoader
   .newInstance()
 myTalker.talk()
   </code></pre>
-  <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-// Cannot resolve symbol talk
-  </code></pre>
+</section>
+
+<section data-speaker="adrien">
+  <img src="./images/compileJava.png" style="background:none; border:none; box-shadow:none;"/>
+  <aside class="notes">
+Voilà notre plan d'action <br />
+On va écrire le code source dans un fichier temporaire <br />
+Appeler programmatiquement javac <br />
+Chager la class avec le classloader qui va bien depuis le fichier .class généré
+  </aside>
 </section>
 
 <section data-speaker="adrien">
   <h3>Ouch! </h3>
-  <p>Le type de <code>GeneratedTalker</code> de la variable <code>myTalker</code> n'est pas défini à la compilation !</p>
-  <p>Il nous faut un <strong>pont</strong> entre le <em>Compile Time</em> et le <em>Run Time</em>&hellip; </p>
+
+  <pre class="bigger-code scala"><code data-trim data-noescape>
+myTalker.talk()
+// Cannot resolve symbol talk
+  </code></pre>
+  <p class="fragment">Le type de <code>GeneratedTalker</code> de la variable <code>myTalker</code> n'est pas défini à la compilation !</p>
+  <p class="fragment">Il nous faut un <strong>pont</strong> entre le <em>Compile Time</em> et le <em>Run Time</em>&hellip; </p>
   <pre class="bigger-code java fragment"><code data-trim data-noescape>
 public interface Talker {
     String talk();
