@@ -8,7 +8,7 @@ Mais c'est par ici que ça commence un peu à diverger.
 
 <section>
   <h3>De quoi parle-t-on&nbsp;?</h3>
-  <p>Maintenant que l'on sait par quelles étapes passer, <strong>de quelle manière</strong> est-ce que l'on les exécute&nbsp;?</p>
+  <p>Maintenant que l'on sait par quelles étapes passer, <strong>de quelle manière</strong> les exécute-t-on&nbsp;?</p>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
 trait PhysicalPlan {
 
@@ -83,6 +83,11 @@ Méthode que l'on va appliquer à l'aide du prédicat qui a été défini défin
 On peut assi voir le NestedLoopJoin qui va être une implémentation de la jointure en se basant sur deux boucles imbriquées <br />
 A l'inverse du HashJoin qui va lui se baser sur des indexs.
   </aside>
+</section>
+
+<section>
+  <p>On garde les mêmes étapes et on rajoute du contexte</p>
+  <img src="./images/logical-plan-to-physical-plan.png" />
 </section>
 
 <section>

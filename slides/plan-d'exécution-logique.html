@@ -140,14 +140,14 @@ Il est possible d'appliquer des lois algébriques qui vont nous aider à optimis
 
 <section>
   <h4>Exemple&nbsp;:</h4>
-  <p>Les schémas qui vont bien</p>
+  <img src="./images/predicate-pushdown.png" />
 </section>
 
 <section>
   <h4>Cas du <code>PushDownFilter</code>&nbsp;:</h4>
   <p>L'objectif est de passer l'étape <code>Filter</code> au plus tôt. </p>
   <pre class="bigger-code scala"><code data-trim data-noescape>
-object PushDownFilter extends Rule[LogicalPlan] {
+object PushPredicateThroughJoin extends Rule[LogicalPlan] {
 
   override def apply(logicalPlan: LogicalPlan): LogicalPlan = {
     logicalPlan transformDown {
@@ -244,5 +244,6 @@ Project [firstName#39, lastName#40]
     <li>Il peut être optimisé en s'appuyant sur des règles algébriques&nbsp;;</li>
     <li>Il est purement déclaratif. </li>
   </ul>
+  <img src="./images/full-pipeline_logical-plan.png" />
   <p><span class="fragment">Maintenant que l'on sait ce que l'on va exécuter&hellip; </span><span class="fragment">Exécutons-le&nbsp;!</span></p>
 </section>

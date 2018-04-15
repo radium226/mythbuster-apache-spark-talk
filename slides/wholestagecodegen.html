@@ -2,8 +2,18 @@
   <h2>Génération dynamique d'un opérateur</h2>
 </section>
 
-<section data-speaker="marc">
-  <img style="width:50%; height: 50%;" src="./images/wholestagecodegen.png" />
+<section data-speaker="marc" data-transition="fade-out">
+  <img src="./images/wholestagecodegen_1.png" />
+  <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
+</section>
+
+<section data-speaker="marc" data-transition="fade-out fade-in">
+  <img src="./images/wholestagecodegen_2.png" />
+  <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
+</section>
+
+<section data-speaker="marc" data-transition="fade-in">
+  <img src="./images/wholestagecodegen_3.png" />
   <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
 </section>
 
@@ -23,8 +33,28 @@ def generateCode: PhysicalPlan => PhysicalPlan
   </aside>
 </section>
 
-<section>
+<section data-transition="fade-out">
   <img src="./images/seems-legit.jpg" />
+</section>
+
+<section data-transition="fade-out fade-in">
+  <img src="./images/code-generation_1.png" />
+</section>
+
+<section data-transition="fade-out fade-in">
+  <img src="./images/code-generation_2.png" />
+</section>
+
+<section data-transition="fade-out fade-in">
+  <img src="./images/code-generation_3.png" />
+</section>
+
+<section data-transition="fade-out fade-in">
+  <img src="./images/code-generation_4.png" />
+</section>
+
+<section data-transition="fade-in">
+  <img src="./images/code-generation_5.png" />
 </section>
 
 <section data-speaker="marc">
@@ -157,4 +187,5 @@ def execute: String => Iterator[Row] = { sql =>
   )(sql).execute
 }
   </code></pre>
+  <img src="./images/full-pipepline_complete.png" />
 </section>
