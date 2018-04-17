@@ -1,4 +1,4 @@
-<section data-background-class="mandy">
+<section data-background-class="mandy" data-speaker="adrien">
   <h2>Aperçu d'<em>Apache Spark</em></h2>
   <aside class="notes">
 Pas de panique, nous allons d'abord faire quelques rappels sur ce qu'est Apache Spark <br />
@@ -6,7 +6,7 @@ Qui dans la salle connait Apache Spark et l'utilise en production ?
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <img src="./images/apache-spark-logo.svg" />
   <img src="./images/spark.png" />
   <aside class="notes">
@@ -18,7 +18,7 @@ On peut voir ça comme une espèce d'ETL distribué <br />
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <h3>En résumé, <em>Apache Spark</em>&nbsp;:</h3>
   <ul>
     <li>Est un <strong>framework de calcul distribué</strong> <em>In Memory</em>&nbsp;;</li>
@@ -32,7 +32,7 @@ Les abstractions ne sont pas des évolutions mais bel et bien des niveaux d'abst
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h3>Jeu de données&nbsp;:</h3>
   <div>
     <div style="font-size: 0.75em;">
@@ -92,7 +92,7 @@ Ne le perdez pas de vue !
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h4>Les <code>RDD</code></h4>
   <div>
     <p>Les <code>RDD[_]</code>&nbsp;: un <code>Iterator[_]</code> distribué et résilient. </p>
@@ -127,7 +127,7 @@ C'est à dire que ces transformations ne sont réalisées qu'une fois qu'une act
   </aside>
 </section>
 
-<section>
+<section data-speaker="marc">
   <h4>Les <code>DataFrames</code></h4>
   <div>
     <p>Les <code>DataFrame</code> qui fournissent un DSL de manipulation des données structurées.</p>
@@ -159,7 +159,7 @@ On dirait presque du SQL...
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h4>Le SQL</h4>
   <div>
     <p>Le SQL qui permet de réaliser des requêtes homogènes sur des sources de données hétérogènes.</p>
@@ -193,7 +193,7 @@ Pour l'exemple, on a ici des données qui viennent d'une séquence statique, mai
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <h3>Le projet <em>Tungsten</em>&nbsp;:</h3>
   <ul>
     <li>Initié à partir d'<em>Apache Spark</em> 1.4&nbsp;;</li>
@@ -206,7 +206,7 @@ Suite aux bench de Databricks : CPU is the bottelneck
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <img src="./images/wait-a-minute.jpg" />
   <aside class="notes">
 Qu'est ce que ça veut dire génération de code à la volée ?

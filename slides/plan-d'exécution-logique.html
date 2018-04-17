@@ -6,7 +6,7 @@ La première, c'est de transformer notre AST dans un Plan d'execution logique
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h3>Deux contexts distincts&hellip;</h3>
   <img src="./images/query-planner.png" />
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -20,7 +20,7 @@ L'AST correspond au langage tandis que le plan d'exection logique va être dans 
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <h3>De quoi parle-t-on&nbsp;?</h3>
   <p>L'idée est de décrire <strong>les différentes étapes</strong> nécessaire à l'évaluation l'<em>AST</em>.</p>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -39,7 +39,7 @@ C'est interessant de noter que Spark (et dans les bases de données en général
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Join(
   leftChild: LogicalPlan, rightChild: LogicalPlan,
@@ -75,18 +75,18 @@ On a ici le "ce que l'on veut faire", mais pas le "comment on va le faire"
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h4>Exemple&nbsp;:</h4>
   <img src="./images/volcano-model-logical-plan.png" />
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h4>Un peu d'algèbre&nbsp;:</h4>
   <p>Cela reprend le concept des opérateurs de l'algèbre relationnelle.</p>
   <img src="./images/logical-plan-vs-operateur-algebrique.png" />
 </section>
 
-<section data-transition="fade-out">
+<section data-transition="fade-out" data-speaker="marc">
   <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_1.png" />
   <aside class="notes">
@@ -96,22 +96,22 @@ Mais ce n'est pas ce qui se passe à ce moment (c'est une vue de l'esprit, quoi)
   </aside>
 </section>
 
-<section data-transition="fade-out fade-in">
+<section data-transition="fade-out fade-in" data-speaker="marc">
   <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_2.png" />
 </section>
 
-<section data-transition="fade-out fade-in">
+<section data-transition="fade-out fade-in" data-speaker="marc">
   <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_3.png" />
 </section>
 
-<section data-transition="fade-in">
+<section data-transition="fade-in" data-speaker="marc">
   <h5>Chaque opérateur représente une action&nbsp;:</h5>
   <img src="./images/optimisation-logique_4.png" />
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h3>Les optimisations&nbsp;:</h3>
   <ul>
     <li>L'objectif est de <strong>réduire le temps d'execution</strong> sans changer le résultat&nbsp;;</li>
@@ -128,7 +128,7 @@ Ce sont des règles purement logique (qui ne s'appuie pas sur la données en tan
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h4>Encore un peu d'algèbre&nbsp;:</h4>
   <p>Les lois algébriques prouvent que le resultat de la requête ne sera pas changé après optimisation. </p>
   <img src="./images/algebrical-rules.png" />
@@ -138,22 +138,22 @@ Il est possible d'appliquer des lois algébriques qui vont nous aider à optimis
   </aside>
 </section>
 
-<section data-transition="fade-out">
+<section data-transition="fade-out" data-speaker="marc">
   <h4>Exemple&nbsp;:</h4>
   <img src="./images/predicate-pushdown_1.png" />
 </section>
 
-<section data-transition="fade-in fade-out">
+<section data-transition="fade-in fade-out" data-speaker="marc">
   <h4>Exemple&nbsp;:</h4>
   <img src="./images/predicate-pushdown_2.png" />
 </section>
 
-<section data-transition="fade-in">
+<section data-transition="fade-in" data-speaker="marc">
   <h4>Exemple&nbsp;:</h4>
   <img src="./images/predicate-pushdown_3.png" />
 </section>
 
-<section>
+<section data-speaker="marc">
   <h4>Cas du <code>PushDownFilter</code>&nbsp;:</h4>
   <p>L'objectif est de passer l'étape <code>Filter</code> au plus tôt. </p>
   <pre class="bigger-code scala"><code data-trim data-noescape>
@@ -178,7 +178,7 @@ object PushPredicateThroughJoin extends Rule[LogicalPlan] {
   </code></pre>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h3>Du côté d'<em>Apache Spark</em>&nbsp;?</h3>
   <div>
     <div class="left-column">
@@ -217,7 +217,7 @@ ConstantFolding,
   </div>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <pre class="bigger-code"><code data-trim data-noescape>
 sparkSession.sql(
   """

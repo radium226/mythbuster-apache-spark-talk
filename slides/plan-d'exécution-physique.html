@@ -6,7 +6,7 @@ Mais c'est par ici que ça commence un peu à diverger.
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h3>De quoi parle-t-on&nbsp;?</h3>
   <p>Maintenant que l'on sait par quelles étapes passer, <strong>de quelle manière</strong> les exécute-t-on&nbsp;?</p>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -27,7 +27,7 @@ Le vrai challenge maintenant va plutôt être d'implémenter les méthodes execu
   </aside>
 </section>
 
-<section>
+<section data-speaker="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class CSVFileFullScan(csvFileURL: URL) extends PhysicalPlan {
 
@@ -52,7 +52,7 @@ Passons les implémentations, parce que là, on va juste utiliser les drivers fo
   </aside>
 </section>
 
-<section>
+<section data-speaker="marc">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 case class Filter(
   child: PhysicalPlan, predicate: Expression
@@ -85,12 +85,12 @@ A l'inverse du HashJoin qui va lui se baser sur des indexs.
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <p>On garde les mêmes étapes et on rajoute du contexte</p>
   <img src="./images/logical-plan-to-physical-plan.png" />
 </section>
 
-<section>
+<section data-speaker="marc">
   <h3>Le <em>Volcano Model</em>&nbsp;:</h3>
   <ul>
     <li>Aussi appelé l'<em>Iterator Model</em>&nbsp;;</li>
@@ -104,14 +104,14 @@ On a ici une correspondance entre un opérateur algébrique défini avant qui va
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <img src="./images/volcano-model.png" />
   <aside class="notes">
 Classe qui s'imbriquent
   </aside>
 </section>
 
-<section data-speaker="adrien">
+<section data-speaker="marc">
   <h3>Du côté d'<em>Apache Spark</em>&hellip;</h3>
   <p>C'est exactement la même chose, sauf que&hellip;</p>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -146,7 +146,7 @@ sparkSession.sql(
   </code></pre>
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="adrien">
   <h3>Ce qu'il faut retenir&nbsp;:</h3>
   <ul>
     <li>Le plan d'exécution physique correspond à l'implémentation des étapes à réaliser pour exécuter la requête SQL&nbsp;;</li>
@@ -156,7 +156,7 @@ sparkSession.sql(
   <img src="./images/full-pipeline_physical-plan.png" />
 </section>
 
-<section>
+<section data-speaker="marc">
   <h3>Oui, mais&hellip;</h3>
   <div>
     <div class="left-column">
@@ -190,12 +190,12 @@ Project("name",
   </aside>
 </section>
 
-<section>
+<section data-speaker="adrien">
   <h3>Une sombre histoire de <em>JIT</em>&nbsp;:</h3>
   <ul>
     <li>Un opérateur 	&rArr; une implémentation du <em>Trait</em> <code>PhysicalPlan</code>&nbsp;;</li>
     <li>Invoquer la méthode <code>execute(...)</code> 	&rArr; Appel à une fonction virtuelle&nbsp;;</li>
-    <li>Trop d'implémentation &rArr; On est dans le cas <em>Megamorphic</em>&nbsp;;</li>
+    <li>Trop d'implémentations &rArr; On est dans le cas <em>Megamorphic</em>&nbsp;;</li>
     <li class="fragment">On casse le <em>Pipelining</em>. </li>
   </ul>
   <p class="fragment">Pour plus de détails&nbsp;: <a href="http://insightfullogic.com/2014/May/12/fast-and-megamorphic-what-influences-method-invoca/">Too Fast, Too Megamorphic: what influences method call performance in Java?</a>. </p>

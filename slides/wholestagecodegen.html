@@ -1,23 +1,23 @@
-<section data-background-class="east-bay">
+<section data-background-class="east-bay" data-speaker="marc">
   <h2>Génération dynamique d'un opérateur</h2>
 </section>
 
-<section data-speaker="marc" data-transition="fade-out">
+<section data-speaker="marc" data-transition="fade-out" data-speaker="marc">
   <img src="./images/wholestagecodegen_1.png" />
   <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
 </section>
 
-<section data-speaker="marc" data-transition="fade-out fade-in">
+<section data-speaker="marc" data-transition="fade-out fade-in" data-speaker="marc">
   <img src="./images/wholestagecodegen_2.png" />
   <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
 </section>
 
-<section data-speaker="marc" data-transition="fade-in">
+<section data-speaker="marc" data-transition="fade-in" data-speaker="marc">
   <img src="./images/wholestagecodegen_3.png" />
   <aside class="notes">Schéma avec plusieurs opérateurs regroupés en 1 seul</aside>
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="marc" >
   <p>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</p>
   <h3 class="fragment">La génération de code&nbsp;!</h3>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
@@ -33,31 +33,31 @@ def generateCode: PhysicalPlan => PhysicalPlan
   </aside>
 </section>
 
-<section data-transition="fade-out">
+<section data-speaker="adrien">
   <img src="./images/seems-legit.jpg" />
 </section>
 
-<section data-transition="fade-out fade-in">
+<section data-transition="fade-out" data-speaker="adrien">
   <img src="./images/code-generation_1.png" />
 </section>
 
-<section data-transition="fade-out fade-in">
+<section data-transition="fade-out fade-in" data-speaker="adrien">
   <img src="./images/code-generation_2.png" />
 </section>
 
-<section data-transition="fade-out fade-in">
+<section data-transition="fade-out fade-in" data-speaker="adrien">
   <img src="./images/code-generation_3.png" />
 </section>
 
-<section data-transition="fade-out fade-in">
+<section data-transition="fade-out fade-in" data-speaker="adrien">
   <img src="./images/code-generation_4.png" />
 </section>
 
-<section data-transition="fade-in">
+<section data-transition="fade-in" data-speaker="adrien">
   <img src="./images/code-generation_5.png" />
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 trait JavaCodeGenerationSupport {
 
@@ -138,7 +138,7 @@ La seule différence est que tout est fait en mémoire, mais le principe est exa
   </aside>
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="adrien">
   <div>
     <div class="left-column">
       <h3>C'est bien&hellip;</h3>
@@ -166,7 +166,7 @@ Par contre : ça fait chier abec les UDF, ça ne marche qu'avec des oéprateurs 
 <section data-speaker="marc">
   <h3>Ce qu'il faut retenir&nbsp;:</h3>
   <ul>
-    <li>La génération de code permet de concerver le <em>Pipelining</em> de la donnée&nbsp;;</li>
+    <li>La génération de code permet de conserver le <em>Pipelining</em> de la donnée&nbsp;;</li>
     <li>On génère à la volée une étape du plan d'exécution physique designée exprès pour la requête en entrée&nbsp;;</li>
     <li>Cette nouvelle étape est totalement transparente pour le développeur (car gérée totalement par <em>Catalyst</em>). </li>
   </ul>

@@ -1,8 +1,8 @@
-<section data-background-class="scooter">
+<section data-background-class="scooter" data-speaker="adrien">
   <h2>Parsing d'une requête SQL</h2>
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="adrien">
   <h3>Deux étapes&nbsp;:</h3>
   <img src="./images/lexing_parsing.png" />
   <aside class="notes">
@@ -11,7 +11,7 @@ Le lexing et le parsing en tant que tel
   </aside>
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="adrien">
   <h4>L'analyse lexicale</h4>
   <img src="./images/lexing_2.png" />
   <aside class="notes">
@@ -20,7 +20,7 @@ Les tokens sont, en gros : soit des mots clés (SELECT, etc.) soit des literaux 
   </aside>
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="adrien">
   <pre class="bigger-code scala"><code data-trim data-noescape>
 sealed trait Token
 
@@ -86,7 +86,7 @@ On distingue aussi une sous catégorie qui sont les expressions (en gros, ce que
   </aside>
 </section>
 
-<section data-speaker="marc">
+<section data-speaker="adrien">
   <h3>Implémentations&nbsp;:</h3>
   <div>
     <div class="left-column">
