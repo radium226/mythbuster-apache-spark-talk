@@ -21,7 +21,7 @@
   <p>Comment avoir une seule classe qui contient les opérations de plusieurs classes sans les référencer ?</p>
   <h3 class="fragment">La génération de code&nbsp;!</h3>
   <pre class="bigger-code scala fragment"><code data-trim data-noescape>
-case class JavaCodeGeneration(child: PhysicalPlan)
+case class WholeStageCodegen(child: PhysicalPlan)
   extends PhysicalPlan {
   // ...
 }
