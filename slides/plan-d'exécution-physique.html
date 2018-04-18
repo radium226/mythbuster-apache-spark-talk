@@ -140,9 +140,14 @@ sparkSession.sql(
   </code></pre>
   <pre class="bigger-code fragment"><code data-trim data-noescape>
 == Physical Plan ==
-*Filter (isnotnull(firstName#5) && (firstName#5 = Adrien))
-+- *SerializeFromObject (...)
-   +- Scan ExternalRDDScan[obj#3]
+*Project [firstName#0, lastName#1]
++- *BroadcastHashJoin [id#8], [companyId#2], Inner, BuildRight
+   :- *Project [id#8]
+   :  +- *Filter ((isnotnull(name#7) && (name#7 = OCTO)) && ...)
+   :     +- LocalTableScan [name#7, id#8]
+   +- BroadcastExchange HashedRelationBroadcastMode(...)
+      +- *Filter isnotnull(companyId#2)
+         +- LocalTableScan [firstName#0, lastName#1, companyId#2]
   </code></pre>
 </section>
 
@@ -164,20 +169,28 @@ sparkSession.sql(
 while(rows.hasNext()) {
   Row currentRow = rows.next();
   if(currentRow
-      .get("age") > 18)
-    return currentRow
-      .get("name");
+      .get("name").equals("OCTO"))
+    Row joinedRow =
+      employeesById(row.get("id"));
+    return new Row(
+        joinedRow.get("firstName"),
+        joinedRow.get("lastName")
+        );
 }
       </code></pre>
     </div>
     <div class="right-column">
       <pre class="bigger-code scala"><code data-trim data-noescape>
-Project("name",
-  Filter(
-    Expression("age",
-      greaterThan(18)),
+Project(
+  Seq(
+    "firstName", "lastName"),
+  Join(
+    Filter(
+      HiveTableScan("companies"),
+      Expression("name",
+        equals("OCTO")),
     CsvScan("people.csv")
-  )
+  ),
 )
       </code></pre>
     </div>
